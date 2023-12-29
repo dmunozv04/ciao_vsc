@@ -1,0 +1,60 @@
+{
+    "name": "ciao_vsc",
+    "displayName": "Ciao Prolog",
+    "description": "Support for the Ciao Prolog language",
+    "version": "0.0.1",
+    "publisher": "...",
+    "author": {
+        "name":"Miguel Angel"
+    },
+    "icon": "images/ciao.png",
+    "license": "...",
+    "engines": {
+        "vscode":"^1.0.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Formatters",
+        "Snippets"
+    ],
+    "keywords": [
+        "ciao",
+        "prolog",
+        "snippet",
+        "format"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "..."
+    },
+    "bugs": {
+        "url": "https://www.x.com",
+        "email": "x@x.com"
+    },
+    "contributes": {
+        "languages": [
+            {
+                "id": "ciao",
+                "aliases": [
+                    "Ciao",
+                    "ciao"
+                ],
+                "configuration": "./ciao.configuration.json",
+                "extensions": [""]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "ciao",
+                "scopeName": "source.ciao",
+                "path": "./syntaxes/ciao.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "ciao",
+                "path": "./snippets/ciao.json"
+            }
+        ]
+    }
+}

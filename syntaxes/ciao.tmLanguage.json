@@ -1,0 +1,513 @@
+{
+  "comment": "This Source Code Form is subject to the terms of the Mozilla Public License,\nv. 2.0. If a copy of the MPL was not distributed with this file, You can obtain\none at http://mozilla.org/MPL/2.0/.",
+  "name": "Ciao",
+  "scopeName": "source.ciao",
+  "fileTypes": [
+    "pl",
+    "lpdoc"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "name": "meta.clause.body.ciao",
+      "begin": "(?<=:-)\\s*",
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.clause.bodyend.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#builtin"
+        },
+        {
+          "include": "#operators"
+        },
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "name": "meta.clause.body.ciao",
+          "match": "."
+        }
+      ]
+    },
+    {
+      "name": "meta.clause.head.ciao",
+      "begin": "^\\s*([a-z][a-zA-Z0-9_]*)(\\(?)(?=.*:-.*)",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.function.clause.ciao"
+        },
+        "2": {
+          "name": "punctuation.definition.parameters.begin"
+        }
+      },
+      "end": "((\\)?))\\s*(:-)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.parameters.end"
+        },
+        "3": {
+          "name": "keyword.control.clause.bodybegin.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        }
+      ]
+    },
+    {
+      "name": "meta.fact.ciao",
+      "begin": "^\\s*([a-zA-Z][a-zA-Z0-9_]*)(\\(?)(?!.*(:-|-->).*)",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.function.fact.ciao"
+        },
+        "2": {
+          "name": "punctuation.definition.parameters.begin"
+        }
+      },
+      "end": "((\\)?))\\s*(\\.)(?!\\d+)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.parameters.end"
+        },
+        "3": {
+          "name": "keyword.control.fact.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        }
+      ]
+    },
+    {
+      "name": "meta.doc.ciao",
+      "begin": "^\\s*(:-)\\s*(doc)\\(([a-zA-Z][a-zA-Z0-9]*)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.other.directive.begin.ciao"
+        },
+        "2": {
+          "name": "keyword.other.doc.ciao"
+        },
+        "3": {
+          "name": "keyword.other.parameter.doc.ciao"
+        }
+      },
+      "end": "\\)(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "name": "keyword.other.doc.ciao",
+          "match": "\\b@[a-zA-Z][a-zA-Z0-9_]*\\b"
+        },
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        }
+      ]
+    },
+    {
+      "name": "meta.module.ciao",
+      "begin": "^\\s*(:-)\\s*(public)?\\s*(module|package|bundle|class|interface|mixin)",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.type.begin.ciao"
+        },
+        "2": {
+          "name": "storage.type.module.public.ciao"
+        },
+        "3": {
+          "name": "storage.type.module.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    {
+      "name": "meta.usemodule.ciao",
+      "begin": "^\\s*(:-)\\s*\\b(use_module|ensure_loaded|use_package|include|use_foreign_library|use_foreign_source|reexport|import|initialization|on_abort|use_class|extends|implements|inherit_class)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "support.function.begin.usemodule.ciao"
+        },
+        "2": {
+          "name": "support.function.usemodule.usemodule.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    {
+      "name": "meta.predicate.directives.ciao",
+      "begin": "^\\s*(:-)\\s*\\b(data|dynamic|multifile|impl_defined|meta_predicate|discontiguous|persistent|export|redefining|index|public|constructor|constant|static|attr|mut|fluid|virtual|inheritable)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "support.function.predicate.begin.ciao"
+        },
+        "2": {
+          "name": "support.function.predicate.directives.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    {
+      "name": "meta.library.directives.ciao",
+      "begin": "^\\s*(:-)\\s*\\b(fun_eval|fun_return|lazy|funct|function|argnames|make)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.other.library.begin.ciao"
+        },
+        "2": {
+          "name": "keyword.other.library.directives.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    {
+      "name": "meta.assertion.state.ciao",
+      "begin": "^\\s*(:-)\\s*(checked|true|false|trust|checked)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.begin.ciao"
+        },
+        "2": {
+          "name": "storage.modifier.assertion.state.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    {
+      "name": "meta.directives.ciao",
+      "begin": "^\\s*(:-)\\s*(decl|pred|comp|calls|success|test|texec)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.directive.begin.ciao"
+        },
+        "2": {
+          "name": "keyword.control.assertion.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    {
+      "name": "meta.assertion.type.ciao",
+      "begin": "^\\s*(:-)\\s*(regtype|mtype|mprop)",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.type.begin.ciao"
+        },
+        "2": {
+          "name": "storage.type.assertion.type.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    {
+      "name": "meta.assertion.entry.ciao",
+      "begin": "^\\s*(:-)\\s*(entry)",
+      "beginCaptures": {
+        "1": {
+          "name": "constant.language.begin.ciao"
+        },
+        "2": {
+          "name": "constant.language.assertion.entry.ciao"
+        }
+      },
+      "end": "(\\.)",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.control.end.ciao"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#atom"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    }
+  ],
+  "repository": {
+    "atom": {
+      "patterns": [
+        {
+          "name": "constant.other.atom.simple.ciao",
+          "match": "(?<![a-zA-Z0-9_])[a-z][a-zA-Z0-9_]*(?!\\s*\\(|[a-zA-Z0-9_])"
+        },
+        {
+          "name": "constant.other.atom.quoted.ciao",
+          "match": "'.*?'"
+        },
+        {
+          "name": "constant.other.atom.emptylist.ciao",
+          "match": "\\[\\]"
+        }
+      ]
+    },
+    "builtin": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.directives.ciao",
+          "match": "\\b(new_declaration|op|load_compilation_module|add_sentence_trans|add_term_trans|add_clause_trans|add_goal_trans|set_prolog_flag|push_prolog_flag|pop_prolog_flag|compound_resource|platform_constants|platform|load_resource_module|resource|head_cost|literal_cost|trust_default|granularity_resources|default_cost|load_test_module|load_test_package|extra_compiler_opts|extra_linker_opts)\\b"
+        },
+        {
+          "name": "keyword.control.condcode.directives.ciao",
+          "match": "\\b(if|else|elif|endif|compilation_fact)\\b"
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.todo.ciao",
+          "match": "% (TODO:).*",
+          "captures": {
+            "1": "keyword.control.end.ciao"
+          }
+        },
+        {
+          "name": "comment.line.ciao",
+          "match": "%.*"
+        },
+        {
+          "name": "comment.block.ciao",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.ciao"
+            }
+          }
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.numeric.integer.ciao",
+          "match": "(?<![a-zA-Z]|/)(\\d+|(\\d+\\.\\d+))"
+        },
+        {
+          "name": "string.quoted.double.ciao",
+          "match": "\".*?\""
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.control.cut.ciao",
+          "match": "!"
+        },
+        {
+          "name": "keyword.operator.ciao",
+          "match": "((\\s(is)\\s)|=:=|:|=\\.\\.|=?\\\\?=|\\\\\\+|@?>|@?=?<|\\+|\\*|\\-)"
+        }
+      ]
+    },
+    "variable": {
+      "patterns": [
+        {
+          "name": "variable.parameter.uppercase.ciao",
+          "match": "(?<![a-zA-Z0-9_])[A-Z_][a-zA-Z0-9_]*"
+        },
+        {
+          "name": "variable.language.anonymous.ciao",
+          "match": "(?<!\\w)_"
+        }
+      ]
+    }
+  }
+}
