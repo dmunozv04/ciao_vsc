@@ -1,0 +1,21 @@
+{
+	"name": "ciao-vsc-server",
+	"description": "Server for Language Support for the Ciao Prolog Language.",
+	"version": "1.0.0",
+	"author": {
+        "name": "Ciao Development Team"
+      },
+	"license": "MIT",
+	"engines": {
+		"node": "*"
+	},
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/ciao-lang/ciao"
+      },
+	"dependencies": {
+		"vscode-languageserver": "^8.1.0",
+		"vscode-languageserver-textdocument": "^1.0.8"
+	},
+	"scripts": {}
+}

@@ -1,5 +1,9 @@
 # Changelog
 
-## [0.1.0]
+All notable changes to this project will be documented in this file.
 
-* Initial usable release
+## [1.0.0] - 2024-01-18
+
+### Added
+
+- Initial release of the extension.

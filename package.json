@@ -1,46 +1,58 @@
 {
-    "name": "ciao_vsc",
-    "displayName": "Ciao Prolog",
-    "description": "Support for the Ciao Prolog language",
-    "version": "0.0.1",
-    "publisher": "...",
-    "author": {
-        "name":"Miguel Angel"
+  "name": "ciao-prolog-vsc",
+  "displayName": "Ciao Prolog Language Support",
+  "version": "0.1.0",
+  "publisher": "ciao-lang",
+  "description": "Advanced Prolog language support",
+  "author": {
+    "name": "Ciao Development Team"
+  },
+  "contributors": [
+    {
+      "name": "Marco Ciccalè Baztán"
     },
-    "icon": "images/ciao.png",
-    "license": "...",
-    "engines": {
-        "vscode":"^1.0.0"
-    },
+    "contributors": [
+        {
+            "name": "Miguel Angel"
+        },
+        {
+            "name": "Marco Ciccalè Baztán"
+        }
+    ],
     "categories": [
         "Programming Languages",
         "Formatters",
         "Snippets"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ciao-lang/ciao"
+    },
+    "icon": "images/ciao.png",
+    "pricing": "Free",
+    "activationEvents": [],
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "main": "./out/extension.js",
     "keywords": [
         "ciao",
         "prolog",
         "snippet",
         "format"
     ],
-    "repository": {
-        "type": "git",
-        "url": "..."
-    },
-    "bugs": {
-        "url": "https://www.x.com",
-        "email": "x@x.com"
-    },
     "contributes": {
         "languages": [
             {
                 "id": "ciao",
                 "aliases": [
-                    "Ciao",
-                    "ciao"
+                    "Ciao Prolog",
+                    "ciao-prolog"
                 ],
-                "configuration": "./ciao.configuration.json",
-                "extensions": [""]
+                "configuration": "./language-configuration.json",
+                "extensions": [
+                    ".pl"
+                ]
             }
         ],
         "grammars": [
@@ -53,8 +65,371 @@
         "snippets": [
             {
                 "language": "ciao",
-                "path": "./snippets/ciao.json"
+                "path": "./snippets/snippets.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "ciao.selectSyntaxTheme",
+                "title": "Ciao: Select syntax theme"
+            },
+            {
+                "command": "ciao.disableSyntaxTheme",
+                "title": "Ciao: Disable syntax theme"
+            },
+            {
+                "command": "ciao.startTopLevel",
+                "title": "CiaoSys: (Re)Start Ciao top level"
+            },
+            {
+                "command": "ciao.loadModule",
+                "title": "CiaoSys: (Re)Load file into top level",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.runTests",
+                "title": "CiaoDbg: Run tests in current module",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.runTestsAssrts",
+                "title": "CiaoDbg: Run tests in current module and assertions of exports",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.genDoc",
+                "title": "LPdoc: Generate documentation for file",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.showDoc",
+                "title": "LPdoc: Display documentation for file",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.previewDoc",
+                "title": "LPdoc: Generate and view documentation preview for file",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.openInCiaoPG",
+                "title": "CiaoPG: Open the current file in the Ciao Playground",
+                "enablement": "editorLangId == ciao"
+            }
+        ],
+        "commands": [
+            {
+                "command": "ciao.selectSyntaxTheme",
+                "title": "Ciao: Select syntax theme"
+            },
+            {
+                "command": "ciao.disableSyntaxTheme",
+                "title": "Ciao: Disable syntax theme"
+            },
+            {
+                "command": "ciao.startTopLevel",
+                "title": "CiaoSys: (Re)Start Ciao top level"
+            },
+            {
+                "command": "ciao.loadModule",
+                "title": "CiaoSys: (Re)Load file into top level",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.runTests",
+                "title": "CiaoDbg: Run tests in current module",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.runTestsAssrts",
+                "title": "CiaoDbg: Run tests in current module and assertions of exports",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.genDoc",
+                "title": "LPdoc: Generate documentation for file",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.showHTMLDoc",
+                "title": "LPdoc: View documentation in HTML format",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.previewDoc",
+                "title": "LPdoc: Generate and view documentation preview for file",
+                "enablement": "editorLangId == ciao"
+            },
+            {
+                "command": "ciao.openInCiaoPG",
+                "title": "CiaoPG: Open the current file in the Ciao Playground",
+                "enablement": "editorLangId == ciao"
             }
         ]
+    },
+    "devDependencies": {
+        "@types/node": "^8.10.25",
+        "@types/vscode": "^1.74.0",
+        "@typescript-eslint/eslint-plugin": "^6.7.3",
+        "@typescript-eslint/parser": "^6.7.3",
+        "eslint": "^8.50.0",
+        "eslint-plugin-import": "^2.28.1",
+        "js-yaml": "^4.1.0",
+        "typescript": "^3.9.10"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "shell-quote": "^1.8.1"
     }
+  ],
+  "license": "LGPL-3.0-only",
+  "categories": [
+    "Debuggers",
+    "Testing",
+    "Programming Languages",
+    "Formatters",
+    "Snippets",
+    "Linters",
+    "Education"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ciao-lang/ciao_vsc"
+  },
+  "icon": "public/images/ciao.png",
+  "pricing": "Free",
+  "activationEvents": [],
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "main": "./out/client/src/extension",
+  "keywords": [
+    "ciao",
+    "prolog",
+    "snippet",
+    "format"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ciao",
+        "configuration": "./language-configuration.json",
+        "aliases": [
+          "Ciao Prolog",
+          "ciao-prolog"
+        ],
+        "extensions": [
+          ".pl",
+          ".lpdoc"
+        ],
+        "icon": {
+          "light": "public/images/ciao.png",
+          "dark": "public/images/ciao.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ciao",
+        "scopeName": "source.ciao",
+        "path": "./syntaxes/ciao.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "ciao",
+        "path": "./snippets/snippets.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Ciao Language Support",
+      "properties": {
+        "ciao.checker": {
+          "type": [
+            "string"
+          ],
+          "enum": [
+            "off",
+            "ciaoc",
+            "ciaopp",
+            "ciao-test",
+            "lpdoc"
+          ],
+          "enumDescriptions": [
+            "Enables on-the-fly syntax checking while typing",
+            "Disables on-the-fly checking and syntax errors are only marked when the file is loaded into the Ciao Top Level",
+            "Enables on-the-fly verification",
+            "Enables on-the-fly syntax checking and test running while typing",
+            "Enables on-the-fly syntax checking for lpdoc files"
+          ],
+          "default": "off"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "ciao.promptCiaoInstallation",
+        "category": "Ciao",
+        "title": "Install / Update Ciao"
+      },
+      {
+        "command": "ciao.selectSyntaxTheme",
+        "category": "Ciao",
+        "title": "Select syntax theme"
+      },
+      {
+        "command": "ciao.disableSyntaxTheme",
+        "category": "Ciao",
+        "title": "Disable syntax theme"
+      },
+      {
+        "command": "ciao.startCiaoTopLevel",
+        "category": "CiaoSys",
+        "title": "(Re)Start Ciao top level",
+        "icon": {
+          "light": "public/images/ciao.png",
+          "dark": "public/images/ciao.png"
+        }
+      },
+      {
+        "command": "ciao.startCiaoPPTopLevel",
+        "category": "CiaoSys",
+        "title": "(Re)Start CiaoPP top level"
+      },
+      {
+        "command": "ciao.startLPdocTopLevel",
+        "category": "CiaoSys",
+        "title": "(Re)Start LPdoc top level"
+      },
+      {
+        "command": "ciao.loadModule",
+        "category": "CiaoSys",
+        "title": "(Re)Load file into top level",
+        "enablement": "editorLangId == ciao",
+        "icon": {
+          "dark": "public/icons/load-white.svg",
+          "light": "public/icons/load-black.svg"
+        }
+      },
+      {
+        "command": "ciao.debugModule",
+        "category": "CiaoDbg",
+        "title": "Debug current module",
+        "enablement": "editorLangId == ciao",
+        "icon": {
+          "dark": "public/icons/debug-white.svg",
+          "light": "public/icons/debug-black.svg"
+        }
+      },
+      {
+        "command": "ciao.runTests",
+        "category": "CiaoDbg",
+        "title": "Run tests in current module",
+        "enablement": "editorLangId == ciao"
+      },
+      {
+        "command": "ciao.runTestsAssrts",
+        "category": "CiaoDbg",
+        "title": "Run tests in current module and assertions of exports",
+        "enablement": "editorLangId == ciao"
+      },
+      {
+        "command": "ciao.genDoc",
+        "category": "LPdoc",
+        "title": "Generate documentation for file",
+        "enablement": "editorLangId == ciao"
+      },
+      {
+        "command": "ciao.showDoc",
+        "category": "LPdoc",
+        "title": "Display documentation for file",
+        "enablement": "editorLangId == ciao"
+      },
+      {
+        "command": "ciao.previewDoc",
+        "category": "LPdoc",
+        "title": "Generate and view documentation preview for file",
+        "enablement": "editorLangId == ciao",
+        "icon": {
+          "dark": "public/images/lpdoc.png",
+          "light": "public/images/lpdoc.png"
+        }
+      },
+      {
+        "command": "ciao.openInCiaoPG",
+        "category": "CiaoPG",
+        "title": "Open the current file in the Ciao Playground",
+        "enablement": "editorLangId == ciao",
+        "icon": {
+          "dark": "public/icons/share-white.svg",
+          "light": "public/icons/share-black.svg"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "ciao.startCiaoTopLevel",
+          "group": "navigation",
+          "when": "editorLangId == ciao"
+        },
+        {
+          "command": "ciao.loadModule",
+          "group": "navigation",
+          "when": "editorLangId == ciao"
+        },
+        {
+          "command": "ciao.debugModule",
+          "group": "navigation",
+          "when": "editorLangId == ciao"
+        },
+        {
+          "command": "ciao.previewDoc",
+          "group": "navigation",
+          "when": "editorLangId == ciao"
+        },
+        {
+          "command": "ciao.openInCiaoPG",
+          "group": "navigation",
+          "when": "editorLangId == ciao"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+    "package": "./node_modules/@vscode/vsce/vsce package",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "esbuild-client": "esbuild ./client/src/extension.ts --bundle --outfile=./out/client/src/extension.js --platform=node --format=cjs --external:vscode --minify",
+    "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./out/server/src/server.js --platform=node --format=cjs --external:vscode --minify",
+    "esbuild-types": "esbuild ./shared/types.ts --bundle --outfile=./out/shared/types.js --platform=node --format=cjs --external:vscode --minify",
+    "esbuild-shared": "esbuild ./shared/ciaoParse.ts --bundle --outfile=./out/shared/ciaoParse.js --platform=node --format=cjs --external:vscode --minify",
+    "esbuild": "rm -rf ./out && npm run esbuild-client && npm run esbuild-server && npm run esbuild-types && npm run esbuild-shared"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.1.0",
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@types/vscode": "^1.75.1",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.7.3",
+    "@vscode/vsce": "^2.22.0",
+    "esbuild": "^0.19.8",
+    "eslint": "^8.53.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^3.1.0",
+    "typescript": "^5.2.2"
+  }
 }

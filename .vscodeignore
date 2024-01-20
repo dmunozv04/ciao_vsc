@@ -1,0 +1,25 @@
+node_modules
+client/
+server/
+
+# TypeScript configuration
+tsconfig.json
+client/tsconfig.json
+server/tsconfig.json
+
+# Package lock files
+package-lock.json
+client/package-lock.json
+server/package-lock.json
+
+# Development documentation and files
+DEVEL.md
+docs/**
+
+# Git and Editor specific files
+.git/**
+.gitignore
+.eslintignore
+.eslintrc.js
+.prettierrc.js
+.vscode/**
