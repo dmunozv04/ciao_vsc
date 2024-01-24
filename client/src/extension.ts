@@ -37,16 +37,7 @@ export let diagnosticCollection: DiagnosticCollection;
 
 let ciaoTopLevel: CiaoTopLevel;
 
-// On activation, check if the system is running on WSL
-spawn("grep", ["microsoft", "/proc/sys/kernel/osrelease"]).on(
-  "close",
-  (code: number) => {
-    if (code === 0) isWSL = true;
-    else isWSL = false;
-  }
-);
-
-let ciaoTopLevel: CiaoTopLevel | undefined;
+let client: LanguageClient;
 
 export function activate(context: ExtensionContext): void {
   // Initialize the global storage

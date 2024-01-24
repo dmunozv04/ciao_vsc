@@ -94,66 +94,6 @@ export function previewDoc(): void {
   const filePath = getActiveCiaoFilePath();
 
   if (!filePath) {
-    window.showErrorMessage('Please load a Ciao Prolog file.');
-    return;
-  }
-  let stderrBuffer: string = '';
-  // Generating the random dir
-  const dir: string = createTmpDir(getActiveCiaoFileName() + '_');
-  // Commands to be executed
-  const genDocCmd = `lpdoc -t html --output_dir=${dir} ${quote([filePath])}`;
-  const symLinkCmd = `ln -s ${quote([filePath])} ${
-    dir + sep + getActiveCiaoFileName()
-  }`;
-  const viewDocCmd = `lpdoc -t html --view ${
-    dir + sep + getActiveCiaoFileName()
-  }`;
-  // Executing the commands
-  const lpdoc: ChildProcess = exec(
-    `${genDocCmd} && ${symLinkCmd} && ${viewDocCmd}`
-  );
-  // Capturing stderr
-  lpdoc.stderr.on('data', (data) => {
-    stderrBuffer += data.toString();
-  });
-  // Show errors if any
-  lpdoc.on('close', (exitCode) => {
-    if (exitCode !== 0) {
-      window.showErrorMessage(stderrBuffer);
-    }
-  });
-  if (selected) {
-    const format: string = selected.label.toLowerCase();
-    let stderrBuffer: string = '';
-    const lpdoc: ChildProcess = spawn('lpdoc', [
-      '-t',
-      format,
-      '--view',
-      filePath,
-    ]);
-    lpdoc.stderr.on('data', (data) => {
-      stderrBuffer += data.toString();
-    });
-    lpdoc.on('close', (exitCode) => {
-      if (exitCode === 0) {
-        window.showInformationMessage(
-          'LPdoc: Documentation successfully displayed.'
-        );
-      } else {
-        window.showErrorMessage(stderrBuffer);
-      }
-    });
-  }
-}
-
-/**
- * Generates (in a temporary directory) and displays a preview
- * of the **LPdoc** documentation for the current **Ciao Prolog**
- * file in HTML format
- */
-export function previewDoc(): void {
-  const filePath: string | undefined = getActiveCiaoFilePath();
-  if (!filePath) {
     window.showErrorMessage('Ciao: Please load a Ciao Prolog file.');
     return;
   }

@@ -6,13 +6,20 @@ import {
   Pseudoterminal,
   TerminalDimensions,
   window,
-  workspace,
 } from 'vscode';
-import { CiaoTopLevelKind } from '../enums';
-import { markErrorsOnCiaoSource } from './ciaoFile';
-import { parseErrorMsg } from './ciaoParse';
-import { CiaoTopLevelKind } from '../enums';
-import * as path from 'path';
+import { CiaoTopLevelKind } from '../../../shared/types';
+import {
+  KEYS,
+  COLORS,
+  PROMPTS,
+  ESCAPE_SEQ,
+  debuggerDecorationAtom,
+  debuggerDecorationType,
+} from '../constants';
+import { CommandRing } from './ciaoCommandRing';
+import { CProc } from './cproc';
+import { markDbgMarksOnCiaoSource } from './ciaoFile';
+import { parseDbgMsg } from './ciaoDbg';
 
 export class CiaoPTY implements Pseudoterminal {
   onDidWrite: Event<string>;
