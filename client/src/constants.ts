@@ -36,6 +36,7 @@ export const KEYS = {
   ARROW_RIGHT: '\x1b[C',
   ARROW_LEFT: '\x1b[D',
   CTRL_A: '\x01',
+  CTRL_C: '\x03',
   CTRL_D: '\x04',
   CTRL_E: '\x05',
   CTRL_K: '\x0B',

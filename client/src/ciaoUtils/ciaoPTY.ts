@@ -43,11 +43,11 @@ export class CiaoPTY implements Pseudoterminal {
     this.promptLength = PROMPTS[kind].length;
     this.cursor = 0;
     this.isQueryMode = true;
+    this.commandRing = new CommandRing();
     this.cproc = new CProc(kind, (output: string) => {
       this.isQueryMode = output.endsWith(this.prompt);
       this.#displayOutput(this.#formatOutput(output));
     });
-    this.commandRing = new CommandRing();
   }
 
   async open(dimensions?: TerminalDimensions): Promise<CiaoPTY> {
@@ -103,6 +103,7 @@ export class CiaoPTY implements Pseudoterminal {
         this.#displayOutput(`\r${this.#colorPrompt()}`);
       }
     };
+
     const handleBackspace = (): void => {
       // TODO: Fix deleting characters in the middle of a very big query
       // For a very big one line query that cannot fit in one line
@@ -156,11 +157,8 @@ export class CiaoPTY implements Pseudoterminal {
       this.cursor = 0;
     };
 
-    const handleCtrlD = (): void => {
-      if (!this.isQueryMode) return;
-
-      this.#finishTopLevel();
-      return;
+    const handleCtrlDC = (): void => {
+      this.isQueryMode && this.#finishTopLevel();
     };
 
     const handleCtrlE = (): void => {
@@ -298,8 +296,11 @@ export class CiaoPTY implements Pseudoterminal {
       case KEYS.CTRL_A:
         handleCtrlA();
         break;
+      case KEYS.CTRL_C:
+        handleCtrlDC();
+        break;
       case KEYS.CTRL_D:
-        handleCtrlD();
+        handleCtrlDC();
         break;
       case KEYS.CTRL_E:
         handleCtrlE();
