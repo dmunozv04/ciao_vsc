@@ -20,7 +20,7 @@ import {
   isCiaoInstalled,
   openBrowserTab,
   promptCiaoInstallation,
-  setRunningInWSL,
+  setOS,
 } from './utils';
 import {
   getActiveCiaoFileKind,
@@ -43,8 +43,8 @@ export function activate(context: ExtensionContext): void {
   // Initialize the global storage
   initGlobalStorage(context);
 
-  // Store in the global storage if the user is in WSL or not
-  setRunningInWSL();
+  // Store in the global storage user's OS
+  setOS();
 
   // Prompting the Ciao Installer if it is not installed
   if (!isCiaoInstalled()) {

@@ -11,6 +11,8 @@ export enum CiaoTopLevelKind {
   CiaoPP,
 }
 
+export type OS = 'darwin' | 'linux' | 'wsl' | 'unknown';
+
 export type CiaoDiagnosticInfo = {
   lines: string | undefined;
   msg: string | undefined;

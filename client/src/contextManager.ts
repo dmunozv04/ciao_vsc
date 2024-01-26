@@ -6,8 +6,8 @@ export function initGlobalStorage(context: ExtensionContext): void {
   extensionContext = context;
 }
 
-export function getGlobalValue<T>(key: string): T | undefined {
-  return extensionContext.globalState.get<T>(key);
+export function getGlobalValue<T>(key: string, defaultValue: T): T {
+  return extensionContext.globalState.get<T>(key) ?? defaultValue;
 }
 
 export async function setGlobalValue<T>(key: string, value: T): Promise<void> {

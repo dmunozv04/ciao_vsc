@@ -1,10 +1,18 @@
+import * as os from 'node:os';
 import { mkdtempSync } from 'node:fs';
-import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { window } from 'vscode';
 import { getGlobalValue, setGlobalValue } from './contextManager';
 import { ciaoInstallerCmd } from './constants';
+import { type OS } from '../../shared/types';
+
+const openerCommands: { [K in OS]: string } = {
+  darwin: 'open',
+  linux: 'xdg-open',
+  wsl: 'explorer.exe',
+  unknown: 'false',
+};
 
 /**
  * Opens a browser tab wit the URL specified.
@@ -12,8 +20,8 @@ import { ciaoInstallerCmd } from './constants';
  * @param cwd If specified, set the CWD of the process
  */
 export function openBrowserTab(url: string, cwd?: string): void {
-  const cmd: string = getGlobalValue<boolean>('WSL') ? 'explorer.exe' : 'open';
-  spawn(cmd, [url], { cwd: cwd ?? homedir() });
+  const cmd: string = openerCommands[getOS()];
+  spawn(cmd, [url], { cwd: cwd ?? os.homedir() });
 }
 
 /**
@@ -31,26 +39,41 @@ export function shellQuote(cmd: string): string {
  * @returns path of the created dir
  */
 export function createTmpDir(prefix?: string): string {
-  return mkdtempSync(join(`${tmpdir()}`, `${prefix}`));
+  return mkdtempSync(join(`${os.tmpdir()}`, `${prefix}`));
 }
 
 /**
- * @returns Running in WSL or not
+ * @returns OS
  */
-export function isRunningInWSL(): boolean {
-  return getGlobalValue<boolean>('WSL') ?? false;
+export function getOS(): OS {
+  return getGlobalValue<OS>('OS', 'unknown');
 }
 
 /**
- * Sets in the local storage if the extension is running in WSL or not
+ * Sets in the local storage the OS in which the extension in executing
  */
-export function setRunningInWSL(): void {
-  const { stdout } = spawnSync('grep', [
-    'microsoft',
-    '/proc/sys/kernel/osrelease',
-  ]);
+export function setOS(): void {
+  const platform = os.platform();
 
-  setGlobalValue('WSL', !!String(stdout));
+  if (platform === 'darwin') {
+    setGlobalValue('OS', platform);
+    return;
+  }
+
+  let userOS: OS;
+
+  if (platform === 'linux') {
+    const { stdout } = spawnSync('grep', [
+      'microsoft',
+      '/proc/sys/kernel/osrelease',
+    ]);
+
+    userOS = String(stdout) ? 'wsl' : 'linux';
+  } else {
+    userOS = 'unknown';
+  }
+
+  setGlobalValue('OS', userOS);
 }
 
 /**
@@ -59,7 +82,7 @@ export function setRunningInWSL(): void {
 export function isCiaoInstalled(): boolean {
   const { stdout } = spawnSync('which', ['ciao']);
 
-  return !!String(stdout);
+  return Boolean(String(stdout));
 }
 
 /**
@@ -84,7 +107,7 @@ export async function ciaoNotInstalled(): Promise<void> {
  * Prompts the Ciao Installer in a new terminal
  */
 export function promptCiaoInstallation(): void {
-  const term = window.createTerminal({ cwd: homedir() });
+  const term = window.createTerminal({ cwd: os.homedir() });
   term.show();
   term.sendText(ciaoInstallerCmd);
 }
