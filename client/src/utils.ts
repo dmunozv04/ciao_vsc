@@ -1,3 +1,5 @@
+'use strict';
+
 import * as os from 'node:os';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
@@ -63,12 +65,12 @@ export function setOS(): void {
   let userOS: OS;
 
   if (platform === 'linux') {
-    const { stdout } = spawnSync('grep', [
+    const { status } = spawnSync('grep', [
       'microsoft',
       '/proc/sys/kernel/osrelease',
     ]);
 
-    userOS = String(stdout) ? 'wsl' : 'linux';
+    userOS = status === 0 ? 'wsl' : 'linux';
   } else {
     userOS = 'unknown';
   }
@@ -80,9 +82,9 @@ export function setOS(): void {
  * @returns Ciao installed or not
  */
 export function isCiaoInstalled(): boolean {
-  const { stdout } = spawnSync('which', ['ciao']);
+  const { status } = spawnSync('which', ['ciao']);
 
-  return Boolean(String(stdout));
+  return status === 0;
 }
 
 /**
@@ -109,5 +111,5 @@ export async function ciaoNotInstalled(): Promise<void> {
 export function promptCiaoInstallation(): void {
   const term = window.createTerminal({ cwd: os.homedir() });
   term.show();
-  term.sendText(ciaoInstallerCmd);
+  term.sendText(`${ciaoInstallerCmd} && exit 0`);
 }

@@ -1,7 +1,7 @@
 {
   "name": "ciao-prolog-vsc",
   "displayName": "Ciao Prolog Language Support",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "ciao-lang",
   "description": "Advanced Prolog language support",
   "author": {

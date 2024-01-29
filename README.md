@@ -17,30 +17,48 @@ This extension enhances Visual Studio Code with robust language support for **Ci
 
 To use this extension on Windows, follow these steps, which include setting up Windows Subsystem for Linux (WSL):
 
-1. **Install Visual Studio Code.**
+1. **Install WSL**
 
-2. **Install the WSL extension:**
-
-   - [Link to extension](vscode:extension/ms-vscode-remote.remote-wsl)
-
-3. **Enable WSL:**
-
-   - Open PowerShell as Administrator.
+   - Open **PowerShell** as an _**administrator**_.
    - Run the following command:
 
-     ```powershell
-     Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-     ```
+   ```powershell
+   $ wsl --install
+   ```
 
-   - When the command finishes, you will need to restart Windows.
+   - Restart the PC if necessary.
 
-4. **Install a Linux distribution from the Microsoft Store:**
-
-   - Ubuntu is a popular choice. Set up your Linux username and password during installation.
-
-5. **Open Visual Studio Code within your Linux distribution in WSL:**
+2. **Open Visual Studio Code within your Linux distribution in WSL:**
 
    - You can do this by launching WSL from the Start menu, then running `code .` from the Linux terminal.
+
+3. **Install the WSL extension:**
+
+   - [Link to extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl).
+
+4. **Open a WSL terminal and install WSL Utilities:**
+
+   ```bash
+   $ sudo add-apt-repository ppa:wslutilities/wslu
+   $ sudo apt update
+   $ sudo apt install wslu
+   ```
+
+5. **Create a Ciao Prolog project:**
+
+   ```bash
+   $ mkdir prode && touch ./prode/code.pl
+   ```
+
+6. **Open Visual Studio Code in the recently created project:**
+
+   ```bash
+   $ code prode
+   ```
+
+7. **Install the Advanced Ciao Prolog extension:**
+
+   - [Link to extension](https://marketplace.visualstudio.com/items?itemName=ciao-lang.ciao-prolog-vsc)
 
 After completing these steps, you can also use the extension in Visual Studio Code on your Windows system.
 
