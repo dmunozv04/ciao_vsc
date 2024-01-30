@@ -53,7 +53,7 @@ The next approach was creating a Pseudoterminal (PTY) interface connected to an 
 
 The implementation has the following structure:
 
-<img title="Ciao Top Level Design" alt="Ciao Top Level Design" src="images/design.png">
+![ciao top level design](https://raw.githubusercontent.com/ciao-lang/ciao_vsc/master/docs/images/design.png)
 
 It is promise based so the order of execution of commands is always in the order specified.
 

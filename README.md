@@ -144,7 +144,7 @@ The extension introduces an integrated **Ciao Top Level** within the Visual Stud
 
 Users can send the most useful commands to the **Ciao Top Level** by clicking on a series of special buttons that are available when focused on a **Ciao Prolog** file.
 
-![special buttons for ciao prolog files](./public/images/buttons.jpg)
+![special buttons for ciao prolog files](https://raw.githubusercontent.com/ciao-lang/ciao_vsc/master/public/images/buttons.jpg)
 
 1. **_Play_**: Loads the current module in the **Ciao Top Level**.
 
