@@ -333,6 +333,10 @@ export class CiaoPTY implements Pseudoterminal {
     return await this.cproc.sendQuery(query);
   }
 
+  isRunning(): boolean {
+    return this.cproc.isRunning();
+  }
+
   #deletePrevCmd(): void {
     this.#deleteCurrentLine();
     this.previousLines.forEach(() => {

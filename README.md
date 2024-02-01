@@ -28,83 +28,89 @@ To use this extension on Windows, follow these steps, which include setting up W
 
    - Restart the PC if necessary.
 
-2. **Open Visual Studio Code within your Linux distribution in WSL:**
+2. **Check the WSL installation:**
 
-   - You can do this by launching WSL from the Start menu, then running `code .` from the Linux terminal.
+   - Open **PowerShell**.
+   - Run the following command:
 
-3. **Install the WSL extension:**
+   ```powershell
+   $ wsl
+   ```
+
+3. **Install Visual Studio Code:**
+
+   - [Official Website](https://code.visualstudio.com/download)
+
+4. **Install the WSL extension:**
 
    - [Link to extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl).
 
-4. **Open a WSL terminal and install WSL Utilities:**
+5. **Open a WSL terminal:**
+
+   - Open **PowerShell**.
+   - Run the following command:
+
+   ```powershell
+   $ wsl
+   ```
+
+6. **Install WSL tools and dependencies:**
 
    ```bash
    $ sudo add-apt-repository ppa:wslutilities/wslu
    $ sudo apt update
    $ sudo apt install wslu
+   $ sudo apt install build-essential emacs rlwrap curl
    ```
 
-5. **Create a Ciao Prolog project:**
+7. **Install Ciao Prolog:**
 
-   ```bash
-   $ mkdir prode && touch ./prode/code.pl
-   ```
-
-6. **Open Visual Studio Code in the recently created project:**
-
-   ```bash
-   $ code prode
-   ```
-
-7. **Install the Advanced Ciao Prolog extension:**
-
-   - [Link to extension](https://marketplace.visualstudio.com/items?itemName=ciao-lang.ciao-prolog-vsc)
-
-After completing these steps, you can also use the extension in Visual Studio Code on your Windows system.
-
-Note: For further instructions on how to setup a development environment in Windows using WSL and VSCode, check out the [official VSCode documentation](https://code.visualstudio.com/docs/remote/wsl) or the [official VSCode tutotial](https://code.visualstudio.com/docs/remote/wsl-tutorial).
+   - See the following section: [Installing Ciao Prolog from Visual Studio Code](#installing-ciao-prolog-from-visual-studio-code)
 
 ## Installation (Linux and macOS)
 
-On Linux and macOS, you can install this extension directly in Visual Studio Code without the need for additional setup.
+On Linux and macOS, you can install this extension and _**Ciao Prolog**_ directly in Visual Studio Code without the need for additional setup.
 
-1. **Open Visual Studio Code.**
+1. **Install dependencies:**
 
-2. **Go to the Extensions sidebar.**
+   ```bash
+   $ sudo apt update
+   $ sudo apt install build-essential emacs rlwrap curl
+   ```
 
-3. **Search for "Ciao Prolog Language Support".**
+2. **Install Visual Studio Code:**
 
-4. **Click "Install".**
+   - [Official Website](https://code.visualstudio.com/download)
 
-## Installing Dependencies
+3. **Install Ciao Prolog:**
 
-Before installing **Ciao Prolog** make sure you have all the dependencies required.
+   - See the following section: [Installing Ciao Prolog from Visual Studio Code](#installing-ciao-prolog-from-visual-studio-code)
 
-See [ciao dependencies](https://ciao-lang.org/ciao/build/doc/ciao.html/Install.html#Installing%20dependencies).
+## Installing Ciao Prolog from Visual Studio Code
 
-### Only for WSL Users
+1. **Open a Linux terminal and create a Ciao Prolog file:**
 
-Make sure the utility `wslu` is installed in your system so you can get all the features. See [installing wslu](https://wslutiliti.es/wslu/install.html).
+   ```bash
+   $ mkdir hello-world && touch ./hello-world/code.pl
+   ```
 
-## Installing Ciao Prolog
+2. **Open Visual Studio Code in the new directory from the same terminal:**
 
-### Visual Studio Code
+   ```bash
+   $ code hello-world
+   ```
 
-If **Ciao Prolog** is not installed in your system, follow these steps to install it from Visual Studio Code:
+3. **Install this extension:**
 
-1. **Open Visual Studio Code.**
+   [Link to Extension](https://marketplace.visualstudio.com/items?itemName=ciao-lang.ciao-prolog-vsc)
 
-2. **Create or open a Ciao Prolog file** anywhere on your system (example: `foo.pl`).
+4. **Open the code.pl file and follow the installation instructions:**
 
-3. You will be prompted an information message asking if you want to install it. **Click "Install".**
+   - We reccomend using the default settings for Ciao Prolog.
 
-4. Follow the **installation** steps.
+5. **Restart Visual Studio Code:**
 
-5. Once the installer finishes, **restart Visual Studio Code** to apply the changes.
-
-#### Other alternatives
-
-Access the official [Ciao Prolog Installation Guide](https://ciao-lang.org/install.html) and follow the steps.
+   - When opening `.pl` files, you should see a set of icons in the top-right corner of the Visual Studio Code window.
 
 ## Features
 

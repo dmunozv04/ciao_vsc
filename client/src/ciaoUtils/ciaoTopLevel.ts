@@ -52,4 +52,10 @@ export class CiaoTopLevel implements Disposable {
   async sendQuery(query: string): Promise<string | undefined> {
     return await this.pty?.sendQuery(query);
   }
+  isRunning(): boolean {
+    return this.pty?.isRunning() ?? false;
+  }
+  show(): void {
+    this.terminal?.show();
+  }
 }

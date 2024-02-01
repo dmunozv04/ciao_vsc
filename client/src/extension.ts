@@ -3,8 +3,10 @@
 import * as path from 'node:path';
 import {
   commands,
+  extensions,
   languages,
   workspace,
+  window,
   DiagnosticCollection,
   ExtensionContext,
 } from 'vscode';
@@ -20,6 +22,7 @@ import {
   isCiaoInstalled,
   openBrowserTab,
   promptCiaoInstallation,
+  getOS,
   setOS,
 } from './utils';
 import {
@@ -34,17 +37,35 @@ import { genDoc, previewDoc, showDoc } from './commands/lpdoc';
 import { initGlobalStorage } from './contextManager';
 
 export let diagnosticCollection: DiagnosticCollection;
-
 let ciaoTopLevel: CiaoTopLevel;
-
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext): void {
+export async function activate(context: ExtensionContext): Promise<void> {
   // Initialize the global storage
   initGlobalStorage(context);
 
   // Store in the global storage user's OS
   setOS();
+
+  // If user's using this extension in other OS, prompt alert and redirect to installation guide
+  if (getOS() === 'unknown') {
+    const options = ['Installation Guide', 'Dismiss'];
+    const selection = await window.showWarningMessage(
+      'The Ciao Prolog Language Extension can only run in Linux, macOS or WSL. Please follow the installation instructions.',
+      ...options
+    );
+
+    if (selection === 'Installation Guide') {
+      openBrowserTab(
+        'https://marketplace.visualstudio.com/items?itemName=ciao-lang.ciao-prolog-vsc&ssr=false#user-content-installation-(windows)'
+      );
+    } else {
+      window.showWarningMessage(
+        'The extension will not work in this operative system'
+      );
+    }
+    return;
+  }
 
   // Prompting the Ciao Installer if it is not installed
   if (!isCiaoInstalled()) {
@@ -92,10 +113,8 @@ export function activate(context: ExtensionContext): void {
   // Start a LPdoc Top Level
   // Not functioning until the stable build includes shell args in the LPdoc Top Level
   context.subscriptions.push(
-    commands.registerCommand(
-      'ciao.startLPdocTopLevel',
-      () => console.info('Coming...')
-      // startTopLevel(CiaoTopLevelKind.LPdoc)
+    commands.registerCommand('ciao.startLPdocTopLevel', () =>
+      startTopLevel(CiaoTopLevelKind.LPdoc)
     )
   );
 
@@ -106,6 +125,7 @@ export function activate(context: ExtensionContext): void {
       const fileKind = getActiveCiaoFileKind();
 
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+      ciaoTopLevel.show();
       await sendQuery(
         fileKind === CiaoFileKind.User
           ? `ensure_loaded('${filePath}').`
@@ -122,6 +142,7 @@ export function activate(context: ExtensionContext): void {
       const fileKind = getActiveCiaoFileKind();
 
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+      ciaoTopLevel.show();
       await sendQuery('display_debugged.');
       await sendQuery(
         `debug_module_source(${
@@ -143,6 +164,7 @@ export function activate(context: ExtensionContext): void {
       const filePath = getActiveCiaoFilePath();
 
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+      ciaoTopLevel.show();
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module('${filePath}').`);
     })
@@ -154,6 +176,7 @@ export function activate(context: ExtensionContext): void {
       const filePath = getActiveCiaoFilePath();
 
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+      ciaoTopLevel.show();
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module_check_exp_assrts('${filePath}').`);
     })
@@ -225,12 +248,16 @@ export function deactivate(): Thenable<void> | undefined {
 
 async function startTopLevel(kind: CiaoTopLevelKind): Promise<void> {
   if (getTopLevel(kind)) {
+    if (ciaoTopLevel.isRunning()) {
+      ciaoTopLevel.show();
+      return;
+    }
     ciaoTopLevel?.dispose();
   }
   ciaoTopLevel = await new CiaoTopLevel(kind).start();
   // TODO: When executing a command with no Ciao Top Level started
   // the command is sent before every process is setted up.
-  await new Promise((resolve) => setTimeout(() => resolve(undefined), 500));
+  await new Promise((resolve) => setTimeout(() => resolve(undefined), 750));
 }
 
 async function sendQuery(cmd: string): Promise<string | undefined> {

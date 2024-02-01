@@ -55,27 +55,24 @@ export function getOS(): OS {
  * Sets in the local storage the OS in which the extension in executing
  */
 export function setOS(): void {
-  const platform = os.platform();
-
-  if (platform === 'darwin') {
-    setGlobalValue('OS', platform);
-    return;
+  switch (os.platform()) {
+    case 'linux': {
+      const { status } = spawnSync('grep', [
+        'microsoft',
+        '/proc/sys/kernel/osrelease',
+      ]);
+      setGlobalValue<OS>('OS', status === 0 ? 'wsl' : 'linux');
+      break;
+    }
+    case 'darwin': {
+      setGlobalValue<OS>('OS', 'darwin');
+      break;
+    }
+    default: {
+      setGlobalValue<OS>('OS', 'unknown');
+      break;
+    }
   }
-
-  let userOS: OS;
-
-  if (platform === 'linux') {
-    const { status } = spawnSync('grep', [
-      'microsoft',
-      '/proc/sys/kernel/osrelease',
-    ]);
-
-    userOS = status === 0 ? 'wsl' : 'linux';
-  } else {
-    userOS = 'unknown';
-  }
-
-  setGlobalValue('OS', userOS);
 }
 
 /**
@@ -83,7 +80,6 @@ export function setOS(): void {
  */
 export function isCiaoInstalled(): boolean {
   const { status } = spawnSync('which', ['ciao']);
-
   return status === 0;
 }
 

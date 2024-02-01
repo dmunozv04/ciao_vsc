@@ -74,6 +74,10 @@ export class CProc {
     });
   }
 
+  isRunning(): boolean {
+    return !this.cproc?.killed ?? false;
+  }
+
   exit(): void {
     this.cproc?.kill('SIGQUIT');
   }
