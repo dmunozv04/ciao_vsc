@@ -75,7 +75,7 @@ export class CProc {
   }
 
   isRunning(): boolean {
-    return !this.cproc?.killed ?? false;
+    return !this.cproc?.killed;
   }
 
   exit(): void {

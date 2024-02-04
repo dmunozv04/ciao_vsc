@@ -4,7 +4,7 @@ import * as os from 'node:os';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { window } from 'vscode';
+import { window, workspace } from 'vscode';
 import { getGlobalValue, setGlobalValue } from './contextManager';
 import { ciaoInstallerCmd } from './constants';
 import { type OS } from '../../shared/types';
@@ -108,4 +108,35 @@ export function promptCiaoInstallation(): void {
   const term = window.createTerminal({ cwd: os.homedir() });
   term.show();
   term.sendText(`${ciaoInstallerCmd} && exit 0`);
+}
+
+/**
+ *
+ */
+export async function checkNotSavedFiles(): Promise<void> {
+  const unsavedCiaoFiles = workspace.textDocuments.some(
+    (doc) => doc.languageId === 'ciao' && doc.isDirty
+  );
+
+  if (!unsavedCiaoFiles) return;
+
+  await promptToSaveFiles();
+}
+
+async function promptToSaveFiles(): Promise<void> {
+  const choice = await window.showInformationMessage(
+    'Some Ciao files are not saved. Do you want to save them before continuing?',
+    'Yes',
+    'No'
+  );
+
+  choice === 'Yes' && (await saveFiles());
+}
+
+async function saveFiles(): Promise<void> {
+  const ciaoFilesPromises = workspace.textDocuments
+    .filter((file) => file.languageId === 'ciao')
+    .map((file) => file.save());
+
+  await Promise.all(ciaoFilesPromises);
 }

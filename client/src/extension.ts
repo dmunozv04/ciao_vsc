@@ -24,6 +24,7 @@ import {
   promptCiaoInstallation,
   getOS,
   setOS,
+  checkNotSavedFiles,
 } from './utils';
 import {
   getActiveCiaoFileKind,
@@ -124,8 +125,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
       const filePath = getActiveCiaoFilePath();
       const fileKind = getActiveCiaoFileKind();
 
+      await checkNotSavedFiles();
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+
       ciaoTopLevel.show();
+
       await sendQuery(
         fileKind === CiaoFileKind.User
           ? `ensure_loaded('${filePath}').`
@@ -141,8 +145,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
       const fileNameWithoutExt = getActiveCiaoFileName(false);
       const fileKind = getActiveCiaoFileKind();
 
+      await checkNotSavedFiles();
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+
       ciaoTopLevel.show();
+
       await sendQuery('display_debugged.');
       await sendQuery(
         `debug_module_source(${
@@ -163,8 +170,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     commands.registerCommand('ciao.runTests', async () => {
       const filePath = getActiveCiaoFilePath();
 
+      await checkNotSavedFiles();
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+
       ciaoTopLevel.show();
+
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module('${filePath}').`);
     })
@@ -175,8 +185,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
     commands.registerCommand('ciao.runTestsAssrts', async () => {
       const filePath = getActiveCiaoFilePath();
 
+      await checkNotSavedFiles();
       await startTopLevelIfNotStarted(CiaoTopLevelKind.TopLevel);
+
       ciaoTopLevel.show();
+
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module_check_exp_assrts('${filePath}').`);
     })
