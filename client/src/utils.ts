@@ -12,7 +12,7 @@ import { type OS } from '../../shared/types';
 const openerCommands: { [K in OS]: string } = {
   darwin: 'open',
   linux: 'xdg-open',
-  wsl: 'explorer.exe',
+  wsl: 'wslview',
   unknown: 'false',
 };
 
@@ -111,7 +111,7 @@ export function promptCiaoInstallation(): void {
 }
 
 /**
- *
+ * Checks for unsaved files and prompts a message to save them
  */
 export async function checkNotSavedFiles(): Promise<void> {
   const unsavedCiaoFiles = workspace.textDocuments.some(
