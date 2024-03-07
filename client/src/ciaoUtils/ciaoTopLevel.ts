@@ -33,7 +33,7 @@ export class CiaoTopLevel implements Disposable {
   }
 
   async start(): Promise<CiaoTopLevel> {
-    const name: string = TERMINAL_NAMES[this.topLevelKind];
+    const name = TERMINAL_NAMES[this.topLevelKind];
     this.pty = await new CiaoPTY(this.topLevelKind).open();
     this.terminal = window.createTerminal({
       name,
@@ -46,15 +46,19 @@ export class CiaoTopLevel implements Disposable {
     this.terminal.show();
     return this;
   }
+
   dispose(): void {
     this.terminal?.dispose();
   }
-  async sendQuery(query: string): Promise<string | undefined> {
-    return await this.pty?.sendQuery(query);
+
+  sendQuery(query: string): Promise<string> | undefined {
+    return this.pty?.sendQuery(query);
   }
+
   isRunning(): boolean {
     return this.pty?.isRunning() ?? false;
   }
+
   show(): void {
     this.terminal?.show();
   }

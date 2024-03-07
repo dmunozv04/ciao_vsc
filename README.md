@@ -197,6 +197,14 @@ With a simple command, you can open the current **Ciao Prolog** file in a **Ciao
 
 When debugging a **Ciao Prolog** file, every step taken by the debugger is marked with a blue line in the source code. This visual indication helps users track the debugger's progress and location. For more on using the source debugger.
 
+### Change Ciao Prolog Version
+
+It is possible to choose which version of **Ciao Prolog** is used when creating a **Ciao Top Level**. By default, the extension looks for all the directories under `~/.ciaoroot`. However, you can register a custom location by using the command provided for that purpose. The commands provided are:
+
+- `Ciao: Change Ciao Version`
+- `Ciao: Register Ciao Version`
+- `Ciao: Remove Ciao Version`
+
 These features make the **Ciao Prolog Language Support** extension a powerful tool for developing **Ciao Prolog** applications in Visual Studio Code. To learn more about each feature, refer to the respective sections linked above.
 
 ## Usage
@@ -249,3 +257,4 @@ By default, **_verifly_** comes deactivated. You can activate it through Visual 
    - `ciao-test`: Enables on-the-fly syntax checking and test-running while typing.
 
    - `lpdoc`: Enables on-the-fly syntax checking for lpdoc files.
+

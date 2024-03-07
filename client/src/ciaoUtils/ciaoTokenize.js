@@ -1,5 +1,5 @@
 /* eslint-disable */
-export var ciaoTokenize = (function () {
+export var ciaoTokenize = (function() {
   // JavaScript translation of the Ciao Prolog's tokenizer.pl (and
   // some definitions from the Ciao engine).  --Jose F. Morales
   //
@@ -294,6 +294,13 @@ export var ciaoTokenize = (function () {
           this.getct1();
         } else if (this.ch === '%') {
           // comment
+          while (true) {
+            this.getct();
+            if (this.ch === '\n' || this.ch === '') {
+              // \n is found or end of file
+              break;
+            }
+          }
           this.getct1();
           if (this.ch === '') {
             // end of file
@@ -815,7 +822,7 @@ export var ciaoTokenize = (function () {
 // ---------------------------------------------------------------------------
 // Parser
 /*
-a = `
+const a = `
 message_pp_success(As,Info,AbsInt,Head,Dict,K,Status,FromMod):-
     prepare_output_info(AbsInt, Info, Head, success, RelInfo),
     copy_term((Head,RelInfo,Dict),(GoalCopy,RelInfoCopy,DictCopy)),
@@ -835,8 +842,8 @@ message_pp_success(As,Info,AbsInt,Head,Dict,K,Status,FromMod):-
              '$ana_info'(RelInfoCopy,FromMod)])
 `;
 //b = `f(! ; ' [ ] { } | )`;
-b = a;
+const b = a;
 //  inittbl("!;\"'%(),[]{|}",5);
 
-console.log(ciao_tokenize(b));
+console.log(ciaoTokenize(b));
 */

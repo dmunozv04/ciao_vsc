@@ -21,8 +21,8 @@ export function parseErrorMsg(msgs: string): CiaoDiagnostics {
   msgs.match(regexp)?.forEach((e) => {
     let lines: string | undefined;
     let msg: string | undefined;
-    if (e.match(/{SYNTAX (ERROR|WARNING)/)) return;
-    if (e.match(w_regexp)) {
+    if (/{SYNTAX (ERROR|WARNING)/.test(e)) return;
+    if (w_regexp.test(e)) {
       e.split('\n')
         .filter((line) => line.includes('WARNING') || line.includes('ERROR'))
         .forEach((line) => {

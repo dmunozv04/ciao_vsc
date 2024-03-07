@@ -1,7 +1,7 @@
 {
   "name": "ciao-prolog-vsc",
   "displayName": "Ciao Prolog Language Support",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "publisher": "ciao-lang",
   "description": "Advanced Prolog language support",
   "author": {
@@ -78,6 +78,10 @@
       "type": "object",
       "title": "Ciao Language Support",
       "properties": {
+        "ciao.versions": {
+          "type": "array",
+          "items": "./config.schema.json"
+        },
         "ciao.checker": {
           "type": [
             "string"
@@ -105,6 +109,21 @@
         "command": "ciao.promptCiaoInstallation",
         "category": "Ciao",
         "title": "Install / Update Ciao"
+      },
+      {
+        "command": "ciao.changeCiaoVersion",
+        "category": "Ciao",
+        "title": "Change Ciao version"
+      },
+      {
+        "command": "ciao.registerCiaoVersion",
+        "category": "Ciao",
+        "title": "Register Ciao version"
+      },
+      {
+        "command": "ciao.removeCiaoVersion",
+        "category": "Ciao",
+        "title": "Remove Ciao version"
       },
       {
         "command": "ciao.selectSyntaxTheme",
@@ -231,11 +250,11 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run esbuild",
+    "vscode:prepublish": "npx tsc && npm run lint && npm run esbuild",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
-    "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-    "package": "./node_modules/@vscode/vsce/vsce package",
+    "lint": "npx oxlint@latest -D all -A no-unresolved -A no-undef -A no-array-for-each -A no-array-reduce -A prefer-event-target -A no-abusive-eslint-disable",
+    "package": "./node_modules/.bin/vsce package",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
     "esbuild-client": "esbuild ./client/src/extension.ts --bundle --outfile=./out/client/src/extension.js --platform=node --format=cjs --external:vscode --minify",
     "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./out/server/src/server.js --platform=node --format=cjs --external:vscode --minify",
@@ -255,7 +274,7 @@
     "@typescript-eslint/parser": "^6.7.3",
     "@vscode/vsce": "^2.23.0",
     "esbuild": "^0.19.8",
-    "eslint": "^8.53.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
     "eslint-plugin-import": "^2.29.0",
@@ -263,6 +282,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-promise": "^6.1.1",
     "prettier": "^3.1.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^7.1.0"
   }
 }

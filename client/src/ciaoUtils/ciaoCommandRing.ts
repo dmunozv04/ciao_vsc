@@ -8,7 +8,7 @@ export class CommandRing {
 
   constructor() {
     this.size = 0;
-    this.commands = new Array<string>(this.CMD_RING_SIZE);
+    this.commands = Array.from({ length: this.CMD_RING_SIZE });
     this.currentPosition = 0;
   }
 

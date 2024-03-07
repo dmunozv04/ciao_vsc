@@ -13,6 +13,20 @@ export enum CiaoTopLevelKind {
 
 export type OS = 'darwin' | 'linux' | 'wsl' | 'unknown';
 
+export type CiaoEnvVars = {
+  PATH?: string;
+  MANPATH?: string;
+  INFOPATH?: string;
+  CIAOENGINE?: string;
+  CIAOHDIR?: string;
+  CIAOROOT?: string;
+}
+
+export type CiaoVersion = {
+  name: string;
+  path: string;
+};
+
 export type CiaoDiagnosticInfo = {
   lines: string | undefined;
   msg: string | undefined;

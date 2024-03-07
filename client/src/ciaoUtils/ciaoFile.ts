@@ -78,7 +78,7 @@ export function getActiveCiaoFileName(extension = true): string | undefined {
  */
 export function getActiveCiaoFileKind(): CiaoFileKind | undefined {
   const content = getActiveCiaoFileContent(
-    new Range(new Position(0, 0), new Position(20000, 0))
+    new Range(new Position(0, 0), new Position(20_000, 0))
   );
   if (!content) return;
   if (content.match(/[^\t]*:-[\t\n\s]*(module|class)[\t\n\s]*/) !== null) {
@@ -160,6 +160,8 @@ export function markDbgMarksOnCiaoSource({
   if (!code) return;
   // Tokenize the chunk of code
   const tokens: CiaoToken[] = ciaoTokenize(code);
+
+  // FIXME: ciaoTokenize does take into account the atoms contained in comments
   // Search the line of the nth predName
   let count = 0;
   let predLine = -1;
@@ -171,7 +173,6 @@ export function markDbgMarksOnCiaoSource({
       if (count === nthPred) {
         row = tokens[i].position.row;
         predLine = startLine + tokens[i].position.line;
-        console.log({ predLine, row });
         break;
       }
     }

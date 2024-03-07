@@ -114,7 +114,7 @@ export class CiaoPTY implements Pseudoterminal {
         // Move cursor to the previous line
         this.#displayOutput(ESCAPE_SEQ.PREVIOUS_LINE);
         // Move cursor to the end of the line
-        this.#displayOutput(`\x1b[${this.dimensions.columns}C`);
+        this.#displayOutput(`\u001B[${this.dimensions.columns}C`);
         this.line =
           this.line.slice(0, this.cursor - 1) +
           this.line.slice(this.cursor, this.line.length);
@@ -124,14 +124,14 @@ export class CiaoPTY implements Pseudoterminal {
       }
 
       // For a multiple line query
-      if (this.previousLines.length !== 0 && this.cursor === 0) {
+      if (this.previousLines.length > 0 && this.cursor === 0) {
         // Pop will always return string as the array is not empty
         this.line = this.previousLines.pop() as string;
         this.cursor = this.line.length;
         // Move cursor to the previous line
         this.#displayOutput(ESCAPE_SEQ.PREVIOUS_LINE);
         // Move cursor to the end of the line
-        this.#displayOutput(`\x1b[${this.cursor + this.promptLength}C`);
+        this.#displayOutput(`\u001B[${this.cursor + this.promptLength}C`);
         return;
       }
 
@@ -153,7 +153,7 @@ export class CiaoPTY implements Pseudoterminal {
     const handleCtrlA = (): void => {
       if (!this.isQueryMode) return;
       // Move the cursor to the beginning of the query
-      this.#displayOutput(`\x1b[${this.cursor}D`);
+      this.#displayOutput(`\u001B[${this.cursor}D`);
       this.cursor = 0;
     };
 
@@ -165,7 +165,7 @@ export class CiaoPTY implements Pseudoterminal {
       if (!this.isQueryMode) return;
 
       // Move the cursor to the end of the query
-      this.#displayOutput(`\x1b[${this.line.length - this.cursor}C`);
+      this.#displayOutput(`\u001B[${this.line.length - this.cursor}C`);
       this.cursor = this.line.length;
     };
 
@@ -175,7 +175,7 @@ export class CiaoPTY implements Pseudoterminal {
       this.line = this.line.slice(0, this.cursor);
       this.#deletePrevCmd();
 
-      this.previousLines.length !== 0
+      this.previousLines.length > 0
         ? // Line from a multiple line query
           this.#displayOutput(`\r${'   '}${this.line}`)
         : // Line from a single line query
@@ -201,7 +201,7 @@ export class CiaoPTY implements Pseudoterminal {
       this.line = this.line.slice(this.cursor, this.line.length);
       this.#deletePrevCmd();
       this.cursor = 0;
-      this.previousLines.length !== 0
+      this.previousLines.length > 0
         ? // Line from a multiple line query
           this.#displayOutput(`\r${'   '}${this.line}`)
         : // Line from a single line query
@@ -275,45 +275,58 @@ export class CiaoPTY implements Pseudoterminal {
     };
 
     switch (data) {
-      case KEYS.ARROW_LEFT:
+      case KEYS.ARROW_LEFT: {
         handleArrowLeft();
         break;
-      case KEYS.ARROW_RIGHT:
+      }
+      case KEYS.ARROW_RIGHT: {
         handleArrowRight();
         break;
-      case KEYS.ARROW_UP:
+      }
+      case KEYS.ARROW_UP: {
         handleArrowUp();
         break;
-      case KEYS.ARROW_DOWN:
+      }
+      case KEYS.ARROW_DOWN: {
         handleArrowDown();
         break;
-      case KEYS.BACKSPACE:
+      }
+      case KEYS.BACKSPACE: {
         handleBackspace();
         break;
-      case KEYS.ENTER:
+      }
+      case KEYS.ENTER: {
         handleEnter();
         break;
-      case KEYS.CTRL_A:
+      }
+      case KEYS.CTRL_A: {
         handleCtrlA();
         break;
-      case KEYS.CTRL_C:
+      }
+      case KEYS.CTRL_C: {
         handleCtrlDC();
         break;
-      case KEYS.CTRL_D:
+      }
+      case KEYS.CTRL_D: {
         handleCtrlDC();
         break;
-      case KEYS.CTRL_E:
+      }
+      case KEYS.CTRL_E: {
         handleCtrlE();
         break;
-      case KEYS.CTRL_K:
+      }
+      case KEYS.CTRL_K: {
         handleCtrlK();
         break;
-      case KEYS.CTRL_L:
+      }
+      case KEYS.CTRL_L: {
         handleCtrlL();
         break;
-      case KEYS.CTRL_U:
+      }
+      case KEYS.CTRL_U: {
         handleCtrlU();
         break;
+      }
       default: {
         handleDefaultCase();
       }
@@ -324,13 +337,13 @@ export class CiaoPTY implements Pseudoterminal {
     this.dimensions = dimensions;
   }
 
-  async sendQuery(query: string): Promise<string> {
+  sendQuery(query: string): Promise<string> {
     // en este método, escribir la query en el pseudoterminal
     this.writeEmitter.fire(`${query}\r\n`);
     // guardar el comando en el command ring
     this.commandRing.pushCommand(query);
     // Esperar a que termine el comando
-    return await this.cproc.sendQuery(query);
+    return this.cproc.sendQuery(query);
   }
 
   isRunning(): boolean {
@@ -382,7 +395,7 @@ export class CiaoPTY implements Pseudoterminal {
     output.split('\n').forEach((line) => {
       // Check if the line is a debugger mark line
       // Assuming that the debugger line comes all together?
-      if (line.match(/ {9}In (.*) \(([0-9]+)-([0-9]+)\) (.*?)-([0-9]+)/g)) {
+      if (/ {9}In (.*) \(([0-9]+)-([0-9]+)\) (.*?)-([0-9]+)/g.test(line)) {
         const mark = parseDbgMsg(line);
         if (mark) {
           markDbgMarksOnCiaoSource(mark);
@@ -404,7 +417,8 @@ export class CiaoPTY implements Pseudoterminal {
         line.trim() === 'aborted' ||
         line.trim() === '** here **' ||
         line.includes('ERROR') ||
-        line.includes('FAILED')
+        line.includes('FAILED') ||
+        line.includes('ABORTED')
       ) {
         msgs.push(`${COLORS.RED}${line}${COLORS.RESET}`);
         return;

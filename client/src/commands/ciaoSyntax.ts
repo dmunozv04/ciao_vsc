@@ -19,7 +19,6 @@ import type { EditorSettings, CiaoRule } from '../../../shared/types';
  * rules by the user (if any).
  */
 export async function selectSyntaxTheme(): Promise<void> {
-  console.log(__dirname);
   const items: QuickPickItem[] = [
     {
       label: 'Dark',
@@ -47,7 +46,7 @@ export async function selectSyntaxTheme(): Promise<void> {
   const filePath = path.join(__dirname, '..', '..', '..', 'themes', sourceFile);
   try {
     // Reading theme source file
-    const jsonObject = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const jsonObject = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     // Retrieving and merging other textMateRules defined by the user
     const previousTextMateRules = workspace
       .getConfiguration('editor.tokenColorCustomizations')
@@ -69,7 +68,7 @@ export async function selectSyntaxTheme(): Promise<void> {
         previousSettings,
         ConfigurationTarget.Global
       );
-  } catch (error) {
+  } catch {
     window.showErrorMessage(
       `Ciao: Error in reading ${selected.label} theme from source`
     );

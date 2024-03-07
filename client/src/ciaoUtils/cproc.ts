@@ -4,12 +4,18 @@ import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { workspace } from 'vscode';
 import { EXE, PROMPTS } from '../constants';
 import { markErrorsOnCiaoSource } from './ciaoFile';
-import type { Resolver, OutputCallback } from '../../../shared/types';
+import { isDebuggerLine } from './ciaoDbg';
+import type {
+  Resolver,
+  OutputCallback,
+  CiaoEnvVars,
+} from '../../../shared/types';
 import { CiaoTopLevelKind, CiaoUserConfiguration } from '../../../shared/types';
 import { parseErrorMsg } from '../../../shared/ciaoParse';
+import { getGlobalValue } from '../contextManager';
 
 const getCwd = (): string => {
-  return workspace.workspaceFolders !== undefined
+  return workspace.workspaceFolders
     ? workspace.workspaceFolders[0].uri.fsPath
     : '/';
 };
@@ -22,17 +28,19 @@ const getExecutableInfo = (
 
 export class CProc {
   private outputCallback: OutputCallback;
-  private resolveCommand: Resolver;
+  private resolveCommand: Resolver | undefined;
   private cproc: ChildProcessWithoutNullStreams | undefined;
   private procKind: CiaoTopLevelKind;
+  private commandOutputBuf: string;
   private stdoutBuf: string;
   private stderrBuf: string;
   private errors: string;
+  private flushTimeout: NodeJS.Timeout | undefined;
 
   constructor(procKind: CiaoTopLevelKind, outputCallback: OutputCallback) {
     this.outputCallback = outputCallback;
-    this.resolveCommand = null;
     this.procKind = procKind;
+    this.commandOutputBuf = '';
     this.stdoutBuf = '';
     this.stderrBuf = '';
     this.errors = '';
@@ -44,13 +52,20 @@ export class CProc {
     // Getting executable info
     const { exe, args } = getExecutableInfo(this.procKind);
 
+    // Obtain ENV variables of the Ciao Version
+    const ciaoEnv: CiaoEnvVars = getGlobalValue('CIAO-ENV', {});
+
     // Spawn the process
-    this.cproc = spawn(exe, args, { cwd });
+    this.cproc = spawn(exe, args, {
+      cwd,
+      env: {
+        ...process.env,
+        ...ciaoEnv,
+      },
+    });
 
     // Return a promise that sets all the listeners
     return new Promise<CProc>((resolve) => {
-      this.cproc?.on('error', this.handleError);
-      this.cproc?.on('close', this.handleClose);
       this.cproc?.stderr.on('data', this.handleStderr);
 
       // Setup a 'once' listener to treat differentely the initial
@@ -65,6 +80,14 @@ export class CProc {
         resolve(this);
       });
     });
+  }
+
+  flush(): void {
+    // TODO: Handle stderr?
+    if (!this.stdoutBuf) return;
+    this.outputCallback(this.stdoutBuf);
+    this.commandOutputBuf += this.stdoutBuf;
+    this.stdoutBuf = '';
   }
 
   sendQuery(command: string): Promise<string> {
@@ -82,32 +105,56 @@ export class CProc {
     this.cproc?.kill('SIGQUIT');
   }
 
-  private isWaitingForInput = (): boolean => {
-    return (
-      this.stdoutBuf.endsWith(PROMPTS[this.procKind].text) ||
-      this.stdoutBuf.endsWith(PROMPTS.PROMPTVAL.text)
-    );
-  };
+  private isWaitingForResponse = (): boolean =>
+    this.stdoutBuf.endsWith(PROMPTS.PROMPTVAL.text);
+
+  private isWaitingForInput = (): boolean =>
+    this.stdoutBuf.endsWith(PROMPTS[this.procKind].text) ||
+    this.isWaitingForResponse();
 
   private handleStdout = (buffer: Buffer): void => {
-    // Convert the buffer to string
-    const data = String(buffer);
-
     // Buffering the data
-    this.stdoutBuf += data;
+    this.stdoutBuf += String(buffer);
+
+    // Buffering all the output of the command
+    this.commandOutputBuf += String(buffer);
+
+    // Clear the previous flushTimeout
+    clearTimeout(this.flushTimeout);
 
     // If there's data in STDERR, send it and reset buffer
-    if (this.stderrBuf.length !== 0) {
+    if (this.stderrBuf.length > 0) {
       this.errors = this.stderrBuf;
       this.outputCallback(this.stderrBuf);
       this.stderrBuf = '';
     }
 
-    // Send the chunk of data to PTY
+    // Split the stdout in the last '\n'
+    const lines = this.stdoutBuf.split('\n');
+
+    // Do not add an additional new line character if the buffer only has one line,
+    // or if the previous line is a debugging information line.
+    // TODO: Better implementation?
+    const rest = `${
+      lines.length === 1 || isDebuggerLine(lines[lines.length - 2]) ? '' : '\n'
+    }${lines.pop()}`;
+    const data = lines.join('\n');
+
+    // Buffer the rest of data or restart buffer
+    this.stdoutBuf = rest ?? '';
+
+    // Send the data to the PTY
     this.outputCallback(data);
+
+    // Set the flushTimeout in case there is data in stdout without newlines
+    this.flushTimeout = setTimeout(this.flush.bind(this), 300);
 
     // When the command is finished, reset the buffer and resolve the promise
     if (this.isWaitingForInput() && this.resolveCommand) {
+      // Print the promt
+      this.outputCallback(this.stdoutBuf);
+
+      // Check if the user wants to mark errors on save
       const userConfiguration = workspace
         .getConfiguration('ciao')
         .get<CiaoUserConfiguration>('checker');
@@ -117,9 +164,10 @@ export class CProc {
       }
 
       // Resolve the promise
-      this.resolveCommand(this.stdoutBuf);
+      this.resolveCommand(this.commandOutputBuf);
       // Resetting variables
-      this.resolveCommand = null;
+      this.resolveCommand = undefined;
+      this.commandOutputBuf = '';
       this.stdoutBuf = '';
       this.stderrBuf = '';
       this.errors = '';
@@ -128,20 +176,5 @@ export class CProc {
 
   private handleStderr = (data: Buffer): void => {
     this.stderrBuf += String(data);
-  };
-
-  private handleError = (err: Error): void => {
-    console.error(`error: ${err.message}`);
-  };
-
-  private handleClose = (
-    code: number | null,
-    signal: NodeJS.Signals | null
-  ): void => {
-    console.log(
-      code
-        ? `CProc exited with code ${code}`
-        : `CProc exited with signal ${signal}`
-    );
   };
 }

@@ -70,7 +70,7 @@ function createDiagnostics(
         },
         end: {
           line: Number(endLine) - 1,
-          character: 20000,
+          character: 20_000,
         },
       },
     };

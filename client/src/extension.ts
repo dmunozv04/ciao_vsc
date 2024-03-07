@@ -3,7 +3,6 @@
 import * as path from 'node:path';
 import {
   commands,
-  extensions,
   languages,
   workspace,
   window,
@@ -36,6 +35,11 @@ import { CiaoTopLevel, getTopLevel } from './ciaoUtils/ciaoTopLevel';
 import { disableSyntaxTheme, selectSyntaxTheme } from './commands/ciaoSyntax';
 import { genDoc, previewDoc, showDoc } from './commands/lpdoc';
 import { initGlobalStorage } from './contextManager';
+import {
+  registerNewCiaoVersion,
+  removeCiaoVersion,
+  selectCiaoVersion,
+} from './commands/ciaoVersions';
 
 export let diagnosticCollection: DiagnosticCollection;
 let ciaoTopLevel: CiaoTopLevel;
@@ -85,6 +89,21 @@ export async function activate(context: ExtensionContext): Promise<void> {
       'ciao.promptCiaoInstallation',
       promptCiaoInstallation
     )
+  );
+
+  // Change Ciao Version
+  context.subscriptions.push(
+    commands.registerCommand('ciao.changeCiaoVersion', selectCiaoVersion)
+  );
+
+  // Register a custom Ciao Version
+  context.subscriptions.push(
+    commands.registerCommand('ciao.registerCiaoVersion', registerNewCiaoVersion)
+  );
+
+  // Remove a custom Ciao Version
+  context.subscriptions.push(
+    commands.registerCommand('ciao.removeCiaoVersion', removeCiaoVersion)
   );
 
   // Select a syntax theme
@@ -151,10 +170,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
       ciaoTopLevel.show();
 
       await sendQuery('display_debugged.');
+
+      // TODO: shellQuote?
       await sendQuery(
-        `debug_module_source(${
+        `debug_module_source('${
           fileKind === CiaoFileKind.User ? 'user' : fileNameWithoutExt
-        }).`
+        }').`
       );
       await sendQuery('trace.');
       await sendQuery(
@@ -249,7 +270,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   );
 
   // Start the client. This will also launch the server
-  client.start();
+  client.restart();
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -265,7 +286,8 @@ async function startTopLevel(kind: CiaoTopLevelKind): Promise<void> {
       ciaoTopLevel.show();
       return;
     }
-    ciaoTopLevel?.dispose();
+    ciaoTopLevel.dispose();
+    return;
   }
   ciaoTopLevel = await new CiaoTopLevel(kind).start();
   // TODO: When executing a command with no Ciao Top Level started
@@ -273,8 +295,8 @@ async function startTopLevel(kind: CiaoTopLevelKind): Promise<void> {
   await new Promise((resolve) => setTimeout(() => resolve(undefined), 750));
 }
 
-async function sendQuery(cmd: string): Promise<string | undefined> {
-  return await ciaoTopLevel?.sendQuery(cmd);
+function sendQuery(cmd: string): Promise<string> | undefined {
+  return ciaoTopLevel?.sendQuery(cmd);
 }
 
 function isCiaoTopLevelStarted(kind: CiaoTopLevelKind): boolean {

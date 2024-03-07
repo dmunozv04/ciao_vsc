@@ -1,13 +1,13 @@
 'use strict';
 
 import * as os from 'node:os';
-import { mkdtempSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdtempSync, readdirSync } from 'node:fs';
+import path, { join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { window, workspace } from 'vscode';
+import { commands, window, workspace } from 'vscode';
 import { getGlobalValue, setGlobalValue } from './contextManager';
 import { ciaoInstallerCmd } from './constants';
-import { type OS } from '../../shared/types';
+import { type OS, type CiaoVersion } from '../../shared/types';
 
 const openerCommands: { [K in OS]: string } = {
   darwin: 'open',
@@ -32,7 +32,7 @@ export function openBrowserTab(url: string, cwd?: string): void {
  * @returns Escaped command
  */
 export function shellQuote(cmd: string): string {
-  return `'${cmd.replace(/'/g, "'\\''")}'`;
+  return `'${cmd.replace(/'/, "'\\''")}'`;
 }
 
 /**
@@ -89,7 +89,8 @@ export function isCiaoInstalled(): boolean {
 export async function ciaoNotInstalled(): Promise<void> {
   const selection = await window.showInformationMessage(
     'Ciao Prolog is not installed in the system. Would you like to install it?',
-    ...['Install', 'Dismiss']
+    'Install',
+    'Dismiss'
   );
 
   if (selection === 'Install') {
@@ -123,6 +124,9 @@ export async function checkNotSavedFiles(): Promise<void> {
   await promptToSaveFiles();
 }
 
+/**
+ * Prompts a message asking the user to save the current workspace files
+ */
 async function promptToSaveFiles(): Promise<void> {
   const choice = await window.showInformationMessage(
     'Some Ciao files are not saved. Do you want to save them before continuing?',
@@ -133,10 +137,124 @@ async function promptToSaveFiles(): Promise<void> {
   choice === 'Yes' && (await saveFiles());
 }
 
+/**
+ * Saves all the unsaved files in the current workspace
+ */
 async function saveFiles(): Promise<void> {
   const ciaoFilesPromises = workspace.textDocuments
     .filter((file) => file.languageId === 'ciao')
     .map((file) => file.save());
 
   await Promise.all(ciaoFilesPromises);
+}
+
+/**
+ * @returns An array containing all the information of the installed Ciao versions
+ * under the `.ciaoroot` directory and the versions defined by the user in `settings.json`
+ */
+export function searchAllCiaoVersions(): CiaoVersion[] {
+  return [...searchAutomaticCiaoVersions(), ...searchUserDefinedCiaoVersions()];
+}
+
+/**
+ * @returns All the Ciao Versions under `.ciaoroot` and the PATH version.
+ */
+export function searchAutomaticCiaoVersions(): CiaoVersion[] {
+  const ciaoVersionsPath = `${os.homedir()}/.ciaoroot`;
+
+  // Get the Ciao Version in the PATH
+  const ciaoPathVersion = getCiaoVersionFromPath();
+
+  try {
+    const ciaoVersions: CiaoVersion[] = readdirSync(ciaoVersionsPath, {
+      withFileTypes: true,
+    })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name)
+      .map((ciaoPathName) =>
+        parseCiaoVersion(`${ciaoVersionsPath}/${ciaoPathName}`, ciaoPathName)
+      );
+
+    return [...(ciaoPathVersion ? [ciaoPathVersion] : []), ...ciaoVersions];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * @returns All the Ciao Versions defined manually by the user.
+ */
+export function searchUserDefinedCiaoVersions(): CiaoVersion[] {
+  return workspace.getConfiguration('ciao').get<CiaoVersion[]>('versions', []);
+}
+
+/**
+ * Updates the Ciao Versions inside `settings.json`
+ * @param ciaoVersions The new array of versions
+ */
+export function updateUserDefinedCiaoVersions(
+  ciaoVersions: CiaoVersion[]
+): void {
+  workspace.getConfiguration('ciao').update('versions', ciaoVersions, true);
+}
+
+/**
+ * @param ciaoPathName The name of the directory with a Ciao version
+ * @returns An object with the information parsed
+ */
+export function parseCiaoVersion(
+  absolutePath: string,
+  ciaoPathName: string
+): CiaoVersion {
+  const versionRegex = /^v([^-]*)-([^-]*)-?([^-]*)?/g;
+  const [, versionNumber] = [...ciaoPathName.matchAll(versionRegex)][0];
+
+  const ciaoVersion: CiaoVersion = {
+    path: absolutePath,
+    name: versionNumber,
+  };
+
+  return ciaoVersion;
+}
+
+/**
+ * Function that prompts a message to the user asking if
+ * they want to reload VSCode
+ */
+export async function askUserToReloadVSCode(): Promise<void> {
+  const choice = await window.showInformationMessage(
+    'Please reload Visual Studio Code to apply the changes',
+    'Restart Now'
+  );
+
+  choice === 'Restart Now' && (await reloadVSCode());
+}
+
+/**
+ * Reload VSCode window
+ */
+export async function reloadVSCode(): Promise<void> {
+  const restartAction = 'workbench.action.reloadWindow';
+  try {
+    await commands.executeCommand(restartAction);
+  } catch {
+    window.showErrorMessage('Failed to restart VSCode');
+  }
+}
+
+/*
+ * @returns Path of the Ciao Version inside the PATH
+ */
+function getCiaoVersionFromPath(): CiaoVersion | undefined {
+  // Obtain the ciao version in the PATH
+  const {
+    output: [, stdout],
+  } = spawnSync('which', ['ciao']);
+
+  return stdout
+    ? {
+        name: 'PATH',
+        path: stdout.toString().split(path.sep).slice(0, -3).join(path.sep),
+      }
+    : undefined;
 }

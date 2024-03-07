@@ -17,11 +17,11 @@ export const debuggerDecorationAtom = window.createTextEditorDecorationType({
 });
 
 export const COLORS = {
-  RED: '\x1b[38;5;196m',
-  GREEN: '\x1b[38;5;40m',
-  YELLOW: '\x1b[38;5;220m',
-  ORANGE: '\x1b[38;5;214m',
-  RESET: '\x1b[0m',
+  RED: '\u001B[38;5;196m',
+  GREEN: '\u001B[38;5;40m',
+  YELLOW: '\u001B[38;5;220m',
+  ORANGE: '\u001B[38;5;214m',
+  RESET: '\u001B[0m',
 };
 
 export const KEYS = {
@@ -29,19 +29,19 @@ export const KEYS = {
    * TODO: Handle Shift + Arrow
    */
   ENTER: '\r',
-  BACKSPACE: '\x7f',
+  BACKSPACE: '\u007F',
   SEMICOLON: ';',
-  ARROW_UP: '\x1b[A',
-  ARROW_DOWN: '\x1b[B',
-  ARROW_RIGHT: '\x1b[C',
-  ARROW_LEFT: '\x1b[D',
-  CTRL_A: '\x01',
-  CTRL_C: '\x03',
-  CTRL_D: '\x04',
-  CTRL_E: '\x05',
-  CTRL_K: '\x0B',
-  CTRL_L: '\x0C',
-  CTRL_U: '\x15',
+  ARROW_UP: '\u001B[A',
+  ARROW_DOWN: '\u001B[B',
+  ARROW_RIGHT: '\u001B[C',
+  ARROW_LEFT: '\u001B[D',
+  CTRL_A: '\u0001',
+  CTRL_C: '\u0003',
+  CTRL_D: '\u0004',
+  CTRL_E: '\u0005',
+  CTRL_K: '\u000B',
+  CTRL_L: '\u000C',
+  CTRL_U: '\u0015',
 };
 
 export const TERMINAL_NAMES = {
@@ -64,10 +64,10 @@ export const EXE = {
 };
 
 export const ESCAPE_SEQ = {
-  PREVIOUS_LINE: '\x1b[F',
-  FIRST_LINE: '\x1b[H',
-  DELETE_CHAR: '\x1b[P',
-  CLEAR_SCREEN: '\x1b[2J',
-  CLEAR_LINE: '\x1b[2K',
-  CLEAR_SCROLLBACK_BUF: '\x1b[3J',
+  PREVIOUS_LINE: '\u001B[F',
+  FIRST_LINE: '\u001B[H',
+  DELETE_CHAR: '\u001B[P',
+  CLEAR_SCREEN: '\u001B[2J',
+  CLEAR_LINE: '\u001B[2K',
+  CLEAR_SCROLLBACK_BUF: '\u001B[3J',
 };
