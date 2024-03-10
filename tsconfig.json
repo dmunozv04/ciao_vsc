@@ -10,7 +10,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowJs": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "sourceMap": true,
   },
   "include": ["client/src", "server/src", "shared/"],
   "exclude": ["node_modules"]

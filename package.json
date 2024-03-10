@@ -1,7 +1,7 @@
 {
   "name": "ciao-prolog-vsc",
   "displayName": "Ciao Prolog Language Support",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "ciao-lang",
   "description": "Advanced Prolog language support",
   "author": {
@@ -80,7 +80,7 @@
       "properties": {
         "ciao.versions": {
           "type": "array",
-          "items": "./config.schema.json"
+          "items": "./schemas/ciao-version.schema.json"
         },
         "ciao.checker": {
           "type": [
@@ -250,17 +250,11 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npx tsc && npm run lint && npm run esbuild",
-    "compile": "tsc -b",
-    "watch": "tsc -b -w",
-    "lint": "npx oxlint@latest -D all -A no-unresolved -A no-undef -A no-array-for-each -A no-array-reduce -A prefer-event-target -A no-abusive-eslint-disable",
+    "vscode:prepublish": "npm run lint && npm run compile",
+    "lint": "npx oxlint@latest --deny-warnings -D all -A no-unresolved -A no-undef -A no-array-for-each -A no-array-reduce -A prefer-event-target -A no-abusive-eslint-disable",
     "package": "./node_modules/.bin/vsce package",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "esbuild-client": "esbuild ./client/src/extension.ts --bundle --outfile=./out/client/src/extension.js --platform=node --format=cjs --external:vscode --minify",
-    "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./out/server/src/server.js --platform=node --format=cjs --external:vscode --minify",
-    "esbuild-types": "esbuild ./shared/types.ts --bundle --outfile=./out/shared/types.js --platform=node --format=cjs --external:vscode --minify",
-    "esbuild-shared": "esbuild ./shared/ciaoParse.ts --bundle --outfile=./out/shared/ciaoParse.js --platform=node --format=cjs --external:vscode --minify",
-    "esbuild": "rm -rf ./out && npm run esbuild-client && npm run esbuild-server && npm run esbuild-types && npm run esbuild-shared"
+    "compile": "node ./esbuild.js"
   },
   "dependencies": {
     "vscode-languageclient": "^8.1.0",
@@ -273,7 +267,7 @@
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.7.3",
     "@vscode/vsce": "^2.23.0",
-    "esbuild": "^0.19.8",
+    "esbuild": "0.16.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard-with-typescript": "^39.1.1",

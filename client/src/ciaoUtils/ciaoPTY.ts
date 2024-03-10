@@ -15,6 +15,7 @@ import {
   ESCAPE_SEQ,
   debuggerDecorationAtom,
   debuggerDecorationType,
+  dbgMarkRegex,
 } from '../constants';
 import { CommandRing } from './ciaoCommandRing';
 import { CProc } from './cproc';
@@ -394,12 +395,9 @@ export class CiaoPTY implements Pseudoterminal {
     const msgs: string[] = [];
     output.split('\n').forEach((line) => {
       // Check if the line is a debugger mark line
-      // Assuming that the debugger line comes all together?
-      if (/ {9}In (.*) \(([0-9]+)-([0-9]+)\) (.*?)-([0-9]+)/g.test(line)) {
-        const mark = parseDbgMsg(line);
-        if (mark) {
-          markDbgMarksOnCiaoSource(mark);
-        }
+      const mark = parseDbgMsg(line);
+      if (mark) {
+        markDbgMarksOnCiaoSource(mark);
         return;
       }
       // Green messages

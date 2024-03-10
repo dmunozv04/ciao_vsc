@@ -287,7 +287,6 @@ async function startTopLevel(kind: CiaoTopLevelKind): Promise<void> {
       return;
     }
     ciaoTopLevel.dispose();
-    return;
   }
   ciaoTopLevel = await new CiaoTopLevel(kind).start();
   // TODO: When executing a command with no Ciao Top Level started

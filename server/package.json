@@ -1,16 +1,16 @@
 {
-	"name": "ciao-prolog-vsc-server",
-	"author": {
-		"name": "Ciao Development Team"
+  "name": "ciao-prolog-vsc-server",
+  "author": {
+    "name": "Ciao Development Team"
   },
-	"license": "LGPL-3.0-only",
-	"version": "0.1.5",
-	"publisher": "ciao-lang",
-	"engines": {
-		"node": "*"
-	},
-	"dependencies": {
-		"vscode-languageserver": "^8.1.0",
-		"vscode-languageserver-textdocument": "^1.0.8"
-	}
+  "license": "LGPL-3.0-only",
+  "version": "0.1.6",
+  "publisher": "ciao-lang",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8"
+  }
 }

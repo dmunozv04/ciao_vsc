@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## DRAFT: [0.1.6] - 2024-03-...
+
+### Fixed
+
+- Source Debugger in VSCode now counts the number of appearances of the predicates correctly.
+
 ## [0.1.5] - 2024-03-04
 
 ### Added

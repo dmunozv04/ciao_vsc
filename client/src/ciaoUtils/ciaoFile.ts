@@ -15,7 +15,6 @@ import type {
   CiaoDiagnosticInfo,
   CiaoDiagnostics,
   DebugMark,
-  CiaoToken,
 } from '../../../shared/types';
 import { CiaoFileKind } from '../../../shared/types';
 import { debuggerDecorationAtom, debuggerDecorationType } from '../constants';
@@ -137,7 +136,7 @@ export function markErrorsOnCiaoSource(msgs: CiaoDiagnostics): void {
 
 /**
  * Sets the current debugger mark in source.
- * @param param0 Object containing the parsed info of the debug mark.
+ * @param Object containing the parsed info of the debug mark.
  */
 export function markDbgMarksOnCiaoSource({
   srcFile,
@@ -155,39 +154,44 @@ export function markDbgMarksOnCiaoSource({
     activeEditor.document.lineAt(endLine).range.end
   );
   // Get the chunk of code from source to parse
-  const code: string | undefined = getActiveCiaoFileContent(range);
+  const code = getActiveCiaoFileContent(range);
   // Check if there's code
   if (!code) return;
   // Tokenize the chunk of code
-  const tokens: CiaoToken[] = ciaoTokenize(code);
+  const tokens = ciaoTokenize(code);
 
-  // FIXME: ciaoTokenize does take into account the atoms contained in comments
   // Search the line of the nth predName
   let count = 0;
   let predLine = -1;
   let row = -1;
-  for (let i = 0; i < tokens.length; ++i) {
-    // Found an atom with the same name
-    if (tokens[i].kind === 'atom' && tokens[i].text === predName) {
-      count++;
+
+  for (const token of tokens) {
+    // Found an atom including the name
+    if (token.kind === 'atom' && token.text.includes(predName)) {
+      count += 1;
       if (count === nthPred) {
-        row = tokens[i].position.row;
-        predLine = startLine + tokens[i].position.line;
+        // The count is finished
+        row = token.position.row;
+        predLine = startLine + token.position.line;
         break;
       }
     }
   }
+
   // Check if the line was found
   if (predLine === -1 || row === -1) return;
+
   // Create one line range
   const lineToMark = new Range(
     activeEditor.document.lineAt(predLine).range.start,
     activeEditor.document.lineAt(predLine).range.end
   );
+
   const atomToMark = new Range(
     new Position(predLine, row),
     new Position(predLine, row + predName.length)
   );
+
   // Mark the line on source
   activeEditor.setDecorations(debuggerDecorationType, [lineToMark]);
   // Mark the specific atom on source

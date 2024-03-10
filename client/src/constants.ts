@@ -5,6 +5,9 @@ import { CiaoTopLevelKind } from '../../shared/types';
 
 export const ciaoInstallerCmd = 'curl https://ciao-lang.org/boot -sSfL | sh';
 
+export const dbgMarkRegex =
+  / {0,9}In (.*) \(([0-9]+)-([0-9]+)\) (.*?)-([0-9]+)/;
+
 export const debuggerDecorationType = window.createTextEditorDecorationType({
   backgroundColor: 'rgba(75, 119, 148, 0.3)',
   isWholeLine: true,
