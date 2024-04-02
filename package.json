@@ -1,7 +1,7 @@
 {
   "name": "ciao-prolog-vsc",
   "displayName": "Ciao Prolog Language Support",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "publisher": "ciao-lang",
   "description": "Advanced Prolog language support",
   "author": {
@@ -219,31 +219,31 @@
         }
       }
     ],
-    "menus": {
+   "menus": {
       "editor/title": [
         {
           "command": "ciao.startCiaoTopLevel",
-          "group": "navigation",
+          "group": "navigation@0",
           "when": "editorLangId == ciao"
         },
         {
           "command": "ciao.loadModule",
-          "group": "navigation",
+          "group": "navigation@1",
           "when": "editorLangId == ciao"
         },
         {
           "command": "ciao.debugModule",
-          "group": "navigation",
+          "group": "navigation@2",
           "when": "editorLangId == ciao"
         },
         {
           "command": "ciao.previewDoc",
-          "group": "navigation",
+          "group": "navigation@3",
           "when": "editorLangId == ciao"
         },
         {
           "command": "ciao.openInCiaoPG",
-          "group": "navigation",
+          "group": "navigation@4",
           "when": "editorLangId == ciao"
         }
       ]
@@ -251,7 +251,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run lint && npm run compile",
-    "lint": "npx oxlint@latest --deny-warnings -D all -A no-unresolved -A no-undef -A no-array-for-each -A no-array-reduce -A prefer-event-target -A no-abusive-eslint-disable",
+    "lint": "npx oxlint@0.2.13 --deny-warnings -D all -A no-unresolved -A no-undef -A no-array-for-each -A no-array-reduce -A prefer-event-target -A no-abusive-eslint-disable",
     "package": "./node_modules/.bin/vsce package",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
     "compile": "node ./esbuild.js"
@@ -264,19 +264,9 @@
   "devDependencies": {
     "@types/node": "^20.8.10",
     "@types/vscode": "^1.75.1",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.7.3",
     "@vscode/vsce": "^2.23.0",
     "esbuild": "0.16.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-config-standard-with-typescript": "^39.1.1",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-n": "^16.3.1",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "prettier": "^3.1.0",
-    "typescript": "^5.3.3",
-    "typescript-eslint": "^7.1.0"
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
   }
 }

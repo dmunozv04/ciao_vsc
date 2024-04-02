@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## DRAFT: [0.1.6] - 2024-03-...
+## [0.1.7] - 2024-04-02
+
+### Added
+
+- The Ciao Top Level can be restarted within the same Terminal window in VSCode keeping the command ring and the history of the window.
+
+- The Ciao Top Level menu when the user sends the SIGINT signal (C-c) is now in use and working.
+
+## [0.1.6] - 2024-03-12
+
+### Added
+
+- Sending commands to the Top Level programatically doesn't leave focus on the top level.
 
 ### Fixed
 

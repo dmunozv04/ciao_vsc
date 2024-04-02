@@ -58,6 +58,7 @@ export const PROMPTS = {
   [CiaoTopLevelKind.LPdoc]: { text: 'lpdoc ?- ', length: 9 },
   [CiaoTopLevelKind.CiaoPP]: { text: 'ciaopp ?- ', length: 10 },
   PROMPTVAL: { text: ' ? ', length: 3 },
+  PROMPT_QUIT: { text: 'Ciao interruption (h for help)? ', length: 33 }
 };
 
 export const EXE = {

@@ -15,7 +15,11 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
-import { CiaoFileKind, CiaoTopLevelKind } from '../../shared/types';
+import {
+  CiaoFileKind,
+  CiaoTopLevelKind,
+  MessageOption,
+} from '../../shared/types';
 import {
   ciaoNotInstalled,
   isCiaoInstalled,
@@ -54,13 +58,18 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   // If user's using this extension in other OS, prompt alert and redirect to installation guide
   if (getOS() === 'unknown') {
-    const options = ['Installation Guide', 'Dismiss'];
+    const option: MessageOption = {
+      Ok: 'Installation Guide',
+      Error: 'Dismiss',
+    };
+
     const selection = await window.showWarningMessage(
       'The Ciao Prolog Language Extension can only run in Linux, macOS or WSL. Please follow the installation instructions.',
-      ...options
+      option.Ok,
+      option.Error
     );
 
-    if (selection === 'Installation Guide') {
+    if (selection === option.Ok) {
       openBrowserTab(
         'https://marketplace.visualstudio.com/items?itemName=ciao-lang.ciao-prolog-vsc&ssr=false#user-content-installation-(windows)'
       );
@@ -118,24 +127,23 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   // Start a Ciao Top Level
   context.subscriptions.push(
-    commands.registerCommand('ciao.startCiaoTopLevel', () =>
-      startTopLevel(CiaoTopLevelKind.TopLevel)
-    )
+    commands.registerCommand('ciao.startCiaoTopLevel', async () => {
+      startTopLevel(CiaoTopLevelKind.TopLevel);
+    })
   );
 
   // Start a CiaoPP Top Level
   context.subscriptions.push(
-    commands.registerCommand('ciao.startCiaoPPTopLevel', () =>
-      startTopLevel(CiaoTopLevelKind.CiaoPP)
-    )
+    commands.registerCommand('ciao.startCiaoPPTopLevel', async () => {
+      startTopLevel(CiaoTopLevelKind.CiaoPP);
+    })
   );
 
   // Start a LPdoc Top Level
-  // Not functioning until the stable build includes shell args in the LPdoc Top Level
   context.subscriptions.push(
-    commands.registerCommand('ciao.startLPdocTopLevel', () =>
-      startTopLevel(CiaoTopLevelKind.LPdoc)
-    )
+    commands.registerCommand('ciao.startLPdocTopLevel', async () => {
+      startTopLevel(CiaoTopLevelKind.CiaoPP);
+    })
   );
 
   // Load module in Ciao Top Level
@@ -154,6 +162,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
           ? `ensure_loaded('${filePath}').`
           : `use_module('${filePath}').`
       );
+
+      await focusEditor();
     })
   );
 
@@ -183,6 +193,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
           ? `ensure_loaded('${filePath}').`
           : `use_module('${filePath}').`
       );
+
+      await focusEditor();
     })
   );
 
@@ -198,6 +210,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module('${filePath}').`);
+
+      await focusEditor();
     })
   );
 
@@ -213,6 +227,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
       await sendQuery(`use_module(library(unittest)).`);
       await sendQuery(`run_tests_in_module_check_exp_assrts('${filePath}').`);
+
+      await focusEditor();
     })
   );
 
@@ -281,12 +297,16 @@ export function deactivate(): Thenable<void> | undefined {
 }
 
 async function startTopLevel(kind: CiaoTopLevelKind): Promise<void> {
+  // If the top level window is still active
   if (getTopLevel(kind)) {
+    // If it is running, just show the window
     if (ciaoTopLevel.isRunning()) {
       ciaoTopLevel.show();
       return;
     }
-    ciaoTopLevel.dispose();
+    // If not, restart the CProc and reuse the Terminal and PTY
+    await ciaoTopLevel.restart();
+    return;
   }
   ciaoTopLevel = await new CiaoTopLevel(kind).start();
   // TODO: When executing a command with no Ciao Top Level started
@@ -298,14 +318,12 @@ function sendQuery(cmd: string): Promise<string> | undefined {
   return ciaoTopLevel?.sendQuery(cmd);
 }
 
-function isCiaoTopLevelStarted(kind: CiaoTopLevelKind): boolean {
-  return !!getTopLevel(kind);
-}
-
 async function startTopLevelIfNotStarted(
   kind: CiaoTopLevelKind
 ): Promise<void> {
-  if (!isCiaoTopLevelStarted(kind)) {
-    await startTopLevel(kind);
-  }
+  await startTopLevel(kind);
+}
+
+function focusEditor(): Thenable<void> {
+  return commands.executeCommand('workbench.action.focusActiveEditorGroup');
 }

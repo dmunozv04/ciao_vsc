@@ -11,6 +11,11 @@ export enum CiaoTopLevelKind {
   CiaoPP,
 }
 
+export type MessageOption = {
+  Ok: string;
+  Error: string;
+}
+
 export type OS = 'darwin' | 'linux' | 'wsl' | 'unknown';
 
 export type CiaoEnvVars = {

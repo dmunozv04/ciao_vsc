@@ -226,6 +226,23 @@ To access the Command Palette in Visual Studio Code and select extension command
 
 This simple process allows you to quickly access and use the various commands provided by the **Ciao Prolog Language Support** extension within Visual Studio Code.
 
+<!--- TODO: Figure out useful keybinds for Windows Users
+
+### Keybinds
+
+Some useful **keybinds** are already configured by default so it is faster to interact with the development environment:
+
+| Default Keybind | Windows Keybind | Action |
+| - | - | - |
+| `Ctrl+c t` | `Alt+c t` | (Re)Start Ciao top level |
+| `Ctrl+c l` | `Alt+c l` | (Re)Load file into top level |
+| `Ctrl+c d` | `Alt+c d` | Debug current module |
+| `Ctrl+c u` | `Alt+c u` | Run tests in current module |
+| `Ctrl+c D` | `Alt+c D` | Generate and view documentation preview for file |
+| `Ctrl+c S` | `Alt+c S` | Open the current file in the Ciao Playground |
+
+--->
+
 ### Customizing Syntax Highlighting
 
 By default, the syntax coloring of **Ciao Prolog** Files follow the coloring rules of the current Visual Studio Code editor theme.

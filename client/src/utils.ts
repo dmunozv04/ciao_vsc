@@ -7,7 +7,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { Uri, Webview, commands, window, workspace } from 'vscode';
 import { getGlobalValue, setGlobalValue } from './contextManager';
 import { ciaoInstallerCmd } from './constants';
-import { type OS, type CiaoVersion } from '../../shared/types';
+import { type OS, type CiaoVersion, MessageOption } from '../../shared/types';
 
 const openerCommands: { [K in OS]: string } = {
   darwin: 'open',
@@ -87,13 +87,15 @@ export function isCiaoInstalled(): boolean {
  * Once detected that Ciao is not installed in the system, prompt installation
  */
 export async function ciaoNotInstalled(): Promise<void> {
+  const option: MessageOption = { Ok: 'Install', Error: 'Dismiss' };
+
   const selection = await window.showInformationMessage(
     'Ciao Prolog is not installed in the system. Would you like to install it?',
-    'Install',
-    'Dismiss'
+    option.Ok,
+    option.Error
   );
 
-  if (selection === 'Install') {
+  if (selection === option.Ok) {
     promptCiaoInstallation();
   } else {
     window.showWarningMessage(
@@ -128,13 +130,15 @@ export async function checkNotSavedFiles(): Promise<void> {
  * Prompts a message asking the user to save the current workspace files
  */
 async function promptToSaveFiles(): Promise<void> {
+  const option: MessageOption = { Ok: 'Yes', Error: 'No' };
+
   const choice = await window.showInformationMessage(
     'Some Ciao files are not saved. Do you want to save them before continuing?',
-    'Yes',
-    'No'
+    option.Ok,
+    option.Error
   );
 
-  choice === 'Yes' && (await saveFiles());
+  choice === option.Ok && (await saveFiles());
 }
 
 /**
@@ -222,12 +226,15 @@ export function parseCiaoVersion(
  * they want to reload VSCode
  */
 export async function askUserToReloadVSCode(): Promise<void> {
+  const option: MessageOption = { Ok: 'Restart Now', Error: 'Restart Later' };
+
   const choice = await window.showInformationMessage(
     'Please reload Visual Studio Code to apply the changes',
-    'Restart Now'
+    option.Ok,
+    option.Error
   );
 
-  choice === 'Restart Now' && (await reloadVSCode());
+  choice === option.Ok && (await reloadVSCode());
 }
 
 /**
@@ -271,7 +278,11 @@ export function getNonce(): string {
  * @param pathList An array of strings representing the path to a file/resource
  * @returns A URI pointing to the file/resource
  */
-export function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
+export function getUri(
+  webview: Webview,
+  extensionUri: Uri,
+  pathList: string[]
+) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
 }
 
@@ -284,10 +295,10 @@ function getCiaoVersionFromPath(): CiaoVersion | undefined {
     output: [, stdout],
   } = spawnSync('which', ['ciao']);
 
-  return stdout
-    ? {
-      name: 'PATH',
-      path: stdout.toString().split(path.sep).slice(0, -3).join(path.sep),
-    }
-    : undefined;
+  if (!stdout) return;
+
+  return {
+    name: 'PATH',
+    path: stdout.toString().split(path.sep).slice(0, -3).join(path.sep),
+  };
 }

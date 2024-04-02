@@ -110,9 +110,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   });
 }
 
-connection.onDidChangeWatchedFiles(() => {
-  connection.console.log('We received an file change event');
-});
+connection.onDidChangeWatchedFiles(() => {});
 
 documents.listen(connection);
 

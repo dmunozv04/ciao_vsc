@@ -1,7 +1,7 @@
 'use strict';
 
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
-import { workspace } from 'vscode';
+import { workspace, window } from 'vscode';
 import { EXE, PROMPTS } from '../constants';
 import { markErrorsOnCiaoSource } from './ciaoFile';
 import { isDebuggerLine } from './ciaoDbg';
@@ -66,6 +66,7 @@ export class CProc {
 
     // Return a promise that sets all the listeners
     return new Promise<CProc>((resolve) => {
+      this.cproc?.on('exit', this.handleExit);
       this.cproc?.stderr.on('data', this.handleStderr);
 
       // Setup a 'once' listener to treat differentely the initial
@@ -90,6 +91,14 @@ export class CProc {
     this.stdoutBuf = '';
   }
 
+  // FIXME: NodeJS intercepts the signal before the CProc?
+  interrupt(): Promise<string> {
+    return new Promise<string>((resolve) => {
+      this.resolveCommand = resolve;
+      this.cproc?.kill('SIGINT');
+    });
+  }
+
   sendQuery(command: string): Promise<string> {
     return new Promise<string>((resolve) => {
       this.resolveCommand = resolve;
@@ -98,19 +107,31 @@ export class CProc {
   }
 
   isRunning(): boolean {
-    return !this.cproc?.killed;
+    return (
+      !!this.cproc &&
+      this.cproc.exitCode === null &&
+      (this.cproc.signalCode === null || this.cproc.signalCode === 'SIGINT')
+    );
   }
 
   exit(): void {
     this.cproc?.kill('SIGQUIT');
   }
 
+  private isWaitingForQuit = (): boolean =>
+    this.stdoutBuf.endsWith(PROMPTS.PROMPT_QUIT.text);
+
   private isWaitingForResponse = (): boolean =>
     this.stdoutBuf.endsWith(PROMPTS.PROMPTVAL.text);
 
   private isWaitingForInput = (): boolean =>
     this.stdoutBuf.endsWith(PROMPTS[this.procKind].text) ||
-    this.isWaitingForResponse();
+    this.isWaitingForResponse() ||
+    this.isWaitingForQuit();
+
+  private handleExit = (_code: number, _signal: string) => {
+    this.outputCallback('\r\nCiao Listener finished\r\n\n');
+  };
 
   private handleStdout = (buffer: Buffer): void => {
     // Buffering the data
@@ -135,9 +156,8 @@ export class CProc {
     // Do not add an additional new line character if the buffer only has one line,
     // or if the previous line is a debugging information line.
     // TODO: Better implementation?
-    const rest = `${
-      lines.length === 1 || isDebuggerLine(lines[lines.length - 2]) ? '' : '\n'
-    }${lines.pop()}`;
+    const rest = `${lines.length === 1 || isDebuggerLine(lines[lines.length - 2]) ? '' : '\n'
+      }${lines.pop()}`;
     const data = lines.join('\n');
 
     // Buffer the rest of data or restart buffer

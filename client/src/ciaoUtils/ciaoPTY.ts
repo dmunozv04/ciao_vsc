@@ -15,7 +15,6 @@ import {
   ESCAPE_SEQ,
   debuggerDecorationAtom,
   debuggerDecorationType,
-  dbgMarkRegex,
 } from '../constants';
 import { CommandRing } from './ciaoCommandRing';
 import { CProc } from './cproc';
@@ -35,7 +34,7 @@ export class CiaoPTY implements Pseudoterminal {
   private commandRing: CommandRing;
   private dimensions: TerminalDimensions | undefined;
 
-  constructor(kind: CiaoTopLevelKind) {
+  constructor(commandRing: CommandRing, kind: CiaoTopLevelKind) {
     this.writeEmitter = new EventEmitter<string>();
     this.onDidWrite = this.writeEmitter.event;
     this.line = '';
@@ -44,7 +43,7 @@ export class CiaoPTY implements Pseudoterminal {
     this.promptLength = PROMPTS[kind].length;
     this.cursor = 0;
     this.isQueryMode = true;
-    this.commandRing = new CommandRing();
+    this.commandRing = commandRing;
     this.cproc = new CProc(kind, (output: string) => {
       this.isQueryMode = output.endsWith(this.prompt);
       this.#displayOutput(this.#formatOutput(output));
@@ -58,12 +57,20 @@ export class CiaoPTY implements Pseudoterminal {
     return this;
   }
 
+  async restart(): Promise<void> {
+    this.cproc.exit()
+    await this.cproc.start();
+  }
+
   close(): void {
     // When the user closes the terminal the cproc is terminated
     this.cproc.exit();
+    this.writeEmitter.dispose();
   }
 
   handleInput(data: string): void {
+    // FIXME: When SIGINT is send to CProc, this function does not execute
+    if (!this.isRunning()) return;
     const handleArrowLeft = (): void => {
       if (this.cursor > 0) {
         this.cursor--;
@@ -158,8 +165,13 @@ export class CiaoPTY implements Pseudoterminal {
       this.cursor = 0;
     };
 
-    const handleCtrlDC = (): void => {
-      this.isQueryMode && this.#finishTopLevel();
+    // FIXME: Try to handle Ctrl+C Menu in CProc
+    const handleCtrlC = async (): Promise<void> => {
+      await this.cproc.interrupt(); 
+    }
+
+    const handleCtrlD = (): void => {
+      this.cproc.exit();
     };
 
     const handleCtrlE = (): void => {
@@ -223,12 +235,6 @@ export class CiaoPTY implements Pseudoterminal {
 
       // When the user is executing a query -----------------------------------------
       if (this.isQueryMode && this.line[this.line.length - 1] === '.') {
-        // Stop the Top Level
-        if (this.line.trim() === 'halt.') {
-          this.#finishTopLevel();
-          return;
-        }
-
         this.#displayOutput('\r\n');
         // Join all the parts of the queries
         const command: string = this.previousLines.join('') + this.line;
@@ -305,11 +311,11 @@ export class CiaoPTY implements Pseudoterminal {
         break;
       }
       case KEYS.CTRL_C: {
-        handleCtrlDC();
+        handleCtrlC();
         break;
       }
       case KEYS.CTRL_D: {
-        handleCtrlDC();
+        handleCtrlD();
         break;
       }
       case KEYS.CTRL_E: {
@@ -339,11 +345,11 @@ export class CiaoPTY implements Pseudoterminal {
   }
 
   sendQuery(query: string): Promise<string> {
-    // en este método, escribir la query en el pseudoterminal
+    // Write the query in the pseudoterminal
     this.writeEmitter.fire(`${query}\r\n`);
-    // guardar el comando en el command ring
+    // Save the command in the command ring
     this.commandRing.pushCommand(query);
-    // Esperar a que termine el comando
+    // Return a promise to be awaited
     return this.cproc.sendQuery(query);
   }
 
@@ -443,12 +449,5 @@ export class CiaoPTY implements Pseudoterminal {
 
   #displayOutput(output: string): void {
     this.writeEmitter.fire(output);
-  }
-
-  #finishTopLevel(): void {
-    this.#displayOutput('\r\nCiao listener finished\r\n');
-    this.cproc.exit();
-    this.writeEmitter.dispose();
-    return;
   }
 }
