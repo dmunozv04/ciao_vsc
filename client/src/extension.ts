@@ -279,8 +279,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   // Create the language client and start the client.
   client = new LanguageClient(
-    'languageServerExample',
-    'Language Server Example',
+    'CiaoLanguageServer',
+    'Ciao Language Server',
     serverOptions,
     clientOptions
   );
